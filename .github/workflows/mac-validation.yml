@@ -1,0 +1,21 @@
+name: macOS Swift validation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mac-build-and-tests:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          swift --version
+          python3 --version
+      - name: Source/privacy distribution gate
+        run: python3 Tests/test_public_release.py
+      - name: Full offline checks and native macOS build
+        run: bash scripts/check.sh

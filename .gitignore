@@ -1,0 +1,30 @@
+# Build outputs and local state
+.build/
+dist/
+.swiftpm/
+.DS_Store
+*.log
+*.p12
+*.pfx
+*.pem
+*.key
+*.mobileprovision
+*.xcuserstate
+*.xcuserdata/
+*.entitlements.local
+*.zip
+*.dmg
+*.pkg
+.env
+.env.*
+*.token
+*.secret
+.auth/
+**/auth.json
+**/.credentials.json
+**/session*.json
+Sources/AIChecker/Assets/*.png
+# Python test interpreter output
+__pycache__/
+*.pyc
+*.pyo

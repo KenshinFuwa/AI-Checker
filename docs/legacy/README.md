@@ -1,0 +1,1 @@
+Historical notes are archived here; some install commands and artwork assumptions applied only to locally packaged versions. See root README.md and docs/INSTALL.md for the current source-only public beta.

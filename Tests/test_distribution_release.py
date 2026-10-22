@@ -17,6 +17,7 @@ class ReleaseContracts(unittest.TestCase):
                     'notarytool submit', "status != 'Accepted'",'stapler staple','stapler validate','hdiutil verify', 'stage-release-app.sh', 'audit-release-dmg.sh', '--signed-release', 'build-universal-binary.sh', 'lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64']:
             self.assertIn(key,s)
         self.assertLess(s.index("status != 'Accepted'"),s.index('mkdir -p "$ROOT/dist"'))
+        self.assertIn('python3 scripts/verify-release-checksum.py', s)
         self.assertNotIn('gh release create',s)
         self.assertNotIn('sudo ',s)
         self.assertNotIn('killall ',s)

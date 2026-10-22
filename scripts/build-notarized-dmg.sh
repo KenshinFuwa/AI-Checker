@@ -68,6 +68,7 @@ OUTPUT="$ROOT/dist/AI-Checker-v1.10.1-notarized.dmg"
 [[ ! -e "$OUTPUT" ]] || { echo 'ERROR: distribution artifact already exists; refuse overwrite.' >&2; exit 3; }
 cp "$DMG" "$OUTPUT"
 (cd "$ROOT/dist" && shasum -a 256 "$(basename "$OUTPUT")" > "$(basename "$OUTPUT").sha256")
+python3 scripts/verify-release-checksum.py "$OUTPUT" "$OUTPUT.sha256"
 echo "NOTARIZED_DMG: $OUTPUT"
 echo 'NO_GITHUB_RELEASE_CREATED: true'
 echo 'IMPORTANT: inspect the DMG on a clean Mac, and test upgrades from existing locally signed builds separately.'

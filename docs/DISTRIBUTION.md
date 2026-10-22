@@ -26,7 +26,7 @@ export AI_CHECKER_NOTARY_PROFILE='YOUR_EXISTING_NOTARYTOOL_KEYCHAIN_PROFILE'
 ./scripts/build-notarized-dmg.sh
 ```
 
-Both values above are **placeholders**; do not copy them without substituting your real Keychain identity/profile. The script refuses a missing or non-Developer-ID certificate. It runs source verification, offline tests, native macOS release build, hardened-runtime signing with Apple timestamp, notarization with `notarytool`, staples and validates the DMG, verifies the image, and finally writes `dist/AI-Checker-v1.10.1-notarized.dmg` plus a SHA-256 checksum. If any check fails, no release artifact is published. It never calls `gh release` or modifies `/Applications`.
+Both values above are **placeholders**; do not copy them without substituting your real Keychain identity/profile. The script refuses a missing or non-Developer-ID certificate. It runs source verification, offline tests, native macOS Universal 2 release build, uses the same app staging code as CI, signs with hardened runtime and Apple timestamp, notarizes with `notarytool`, staples and validates the DMG, independently re-audits the mounted signed DMG, and finally writes `dist/AI-Checker-v1.10.1-notarized.dmg` plus a SHA-256 checksum. If any check fails, no release artifact is published. It never calls `gh release` or modifies `/Applications`.
 
 ## 4. Mandatory release gates
 
@@ -40,8 +40,18 @@ Both values above are **placeholders**; do not copy them without substituting yo
 
 ## Important distinction
 
-`script/install-local.sh` is a maintainer-only **locally signed update** script. It is not the public installer; it intentionally checks existing designated requirements and keeps backups. Do not run it for general users. Shipping unsigned/adhoc binaries as 'notarized' is prohibited.
+`scripts/install-local.sh` is a maintainer-only **locally signed update** script. It is not the public installer; it intentionally checks existing designated requirements and keeps backups. Do not run it for general users. Shipping unsigned/adhoc binaries as 'notarized' is prohibited.
 
 ## Safety boundary for unsigned CI DMGs
 
 The Universal 2 CI job creates and mounts a **temporary, untrusted, unsigned** DMG only to verify the installer layout. Its output is deleted by a trap and must not be uploaded as a GitHub artifact, offered to users, or confused with an Apple-notarized release. In the real release script, the same staged layout is signed before notary submission, and the final DMG is audited again **after** Apple returns Accepted and stapler validation succeeds. Until an authorized Apple Developer ID Application identity exists on the owner's Mac, publishing a binary release stays **HOLD**.
+
+## 5. Release asset checksum verification (integrity only)
+
+After a future, independently approved signed release is produced, the build script writes a `.dmg` and a `.dmg.sha256` file. Inspect the publisher's GitHub Release and its security provenance separately. Then check the downloaded bytes without mounting or executing them:
+
+```bash
+python3 scripts/verify-release-checksum.py /absolute/path/AI-Checker-v1.10.1-notarized.dmg /absolute/path/AI-Checker-v1.10.1-notarized.dmg.sha256
+```
+
+This uses Python's standard library and is safe on Linux, Windows or macOS. The validator refuses symlinked inputs, malformed checksum records, incorrect filenames and hash mismatches. **Neither a SHA-256 checksum nor success here establishes that the publisher is legitimate, that Apple notarized the DMG, or that Gatekeeper will permit the app.** Those are separate signing, notarization and clean-machine review gates. Do not offer a link to an unsigned CI artifact.

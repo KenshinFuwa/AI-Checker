@@ -1,3 +1,10 @@
+## v1.10.1 — source release clarity and checksum integrity gate
+
+- Corrected stale release-status claims in English/Japanese README after GitHub merges and green macOS CI.
+- Added standalone SHA-256 asset checksum verification with strict path and record parsing, no network or disk writes.
+- Added integrity tampering tests and invoked the verifier in the guarded notarized DMG builder.
+- Checksum integrity does not prove publisher authenticity or Apple notarization; binary release remains HOLD.
+
 ## v1.10.1 — distribution QA hardening (source only)
 
 - Added shared Universal 2 app staging and read-only mounted DMG layout audit.

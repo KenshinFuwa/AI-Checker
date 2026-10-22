@@ -1,4 +1,4 @@
-> **Release status (2026-10-22):** Open-source beta. The published `main` branch is currently v1.9.2-beta.3; v1.10.1 is a *proposed source update* until its pull request is merged. No Developer ID-signed/notarized binary or end-user DMG has been released. Source and local developer builds are not a general-user installer. macOS CI has not been confirmed green.
+> **Release status (2026-10-22):** Open-source v1.10.1 source beta is merged into `main`. GitHub Actions has passed portable Swift checks, native macOS builds/tests, and an unsigned Universal 2 (arm64 + x86_64) temporary-DMG layout audit. **No Developer ID-signed/notarized app or publicly downloadable DMG exists.** Source and locally built binaries are not a general-user installer; Intel and Apple Silicon clean-install testing remain outstanding.
 
 # AI Checker
 
@@ -8,7 +8,7 @@
 
 AI Checker shows **Codex** and **Claude** usage windows in a compact menu-bar display. It supports native cascading menus, live appearance changes, three menu-bar densities, adjustable bar/number widths, reset/depletion notifications, multiple profiles, and explicit usage data sources.
 
-The v1.9.9-beta.1 patch fixes a macOS Carbon `GetEventParameter` argument-type error from the earlier feature candidate.
+The latest source includes guarded Universal 2 release building and read-only DMG content checks. These do not replace Developer ID signing, notarization, or clean-machine testing.
 
 This is an **independent, unofficial project**. It is not affiliated with, sponsored by, or endorsed by OpenAI, Anthropic, or other providers.
 
@@ -60,7 +60,7 @@ There is **no notarized `.dmg` / public installer** in this source-only beta. Do
 ./scripts/check.sh
 ```
 
-The script runs Swift unit tests, Python policy/regression tests, a local Codex App Server mock and macOS native checks when running on a Mac. GitHub Actions has separate **portable Linux source/core** and **native macOS** jobs. The Linux job excludes the Codex RPC integration test; only the Mac job runs the full `check.sh`. Both must actually pass before merge. Real provider logins, real notification delivery and macOS menu interaction require separate interactive testing.
+The script runs Swift unit tests, Python policy/regression tests, a local Codex App Server mock and macOS native checks when running on a Mac. GitHub Actions has separate **portable Linux source/core**, **native macOS**, and **unsigned Universal 2 + temporary DMG layout** jobs. The Linux job excludes the Codex RPC integration test; only the Mac job runs the full `check.sh`. All three must actually pass before merge. Real provider logins, real notification delivery and macOS menu interaction require separate interactive testing.
 
 ## Data and privacy
 
@@ -87,7 +87,7 @@ The source code is already public at `KenshinFuwa/AI-Checker`. The historical `s
 
 ## End-user distribution
 
-See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) for guarded Developer ID signing and notarization. **No signed DMG is currently available.** The author’s successful Spotlight test required restarting the Mac’s Spotlight indexing services; the app did not fix Spotlight by itself.
+See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) for guarded Developer ID signing and notarization. **No signed DMG is currently available.** The author’s successful Spotlight test required restarting the Mac’s Spotlight indexing services; the app did not fix Spotlight by itself. After an official release exists, verify its `.sha256` alongside the downloaded DMG using `python3 scripts/verify-release-checksum.py /absolute/path/AI-Checker-v1.10.1-notarized.dmg /absolute/path/AI-Checker-v1.10.1-notarized.dmg.sha256`. A checksum only checks file integrity against the supplied digest; it does **not** establish who published either file, Apple notarization, or Gatekeeper approval.
 
 ## Spotlight app discovery
 

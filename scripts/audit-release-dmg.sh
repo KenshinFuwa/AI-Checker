@@ -59,6 +59,16 @@ if pathlib.Path(sys.argv[2]).read_bytes()!=b'APPL????':
 print('PASS: DMG metadata, identity and icon')
 PYPLIST
 lipo "$EXE" -verify_arch arm64 x86_64
+# CI-only, packaged executable AppKit bootstrap. Never install or start a
+# normal account-connected app. The smoke switch is NOT an actual first-run,
+# Gatekeeper/quarantine, notification or Intel-hardware validation.
+if [[ "${AI_CHECKER_CI_BOOTSTRAP:-0}" == "1" ]]; then
+    [[ "$MODE" == --unsigned-preflight ]] || {
+        echo 'ERROR: packaged bootstrap is restricted to unsigned CI preflight.' >&2
+        exit 3
+    }
+    "$EXE" --selftest-packaged-bootstrap
+fi
 if [[ "$MODE" == --signed-release ]]; then
     codesign --verify --strict --verbose=2 "$APP"
     DETAILS="$(codesign -dv --verbose=4 "$APP" 2>&1)"

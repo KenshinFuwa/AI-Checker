@@ -44,6 +44,6 @@ jobs:
       - name: Verify non-secret source manifest
         run: python3 scripts/verify-source-manifest.py
       - name: Build Universal 2, stage app, mount and audit temporary DMG
-        run: bash scripts/check-universal-build.sh
+        run: AI_CHECKER_CI_BOOTSTRAP=1 bash scripts/check-universal-build.sh
       - name: Note distribution status
         run: echo 'This job produces no distributable app; Developer ID and notarization remain mandatory.'

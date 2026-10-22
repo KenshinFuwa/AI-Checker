@@ -23,3 +23,12 @@
 ## 本番配布との区別
 
 Apple Developer IDの正式署名・公証は、別の `scripts/build-notarized-dmg.sh` に限定しています。現在その工程は証明書がないためHOLDです。Appleの公式説明：[安全にアプリを開く](https://support.apple.com/ja-jp/102445)・[Developer ID](https://developer.apple.com/jp/developer-id/)。
+
+## GitHub macOSでの起動ブートストラップ検査
+
+通常CIには、DMGを読み取り専用でマウントし、その中の実行ファイルから
+`--selftest-packaged-bootstrap` を呼ぶ検査を追加しています。AppKit初期化、
+アプリアイコン、メニューバー項目・メニューを検証します。アカウント情報の
+読込み、ネットワーク接続、ログイン項目登録、通知許可、通常イベントループは
+意図的に実行しません。**ユーザーのMacでの通常起動、Gatekeeperの判断、
+通知表示、Intel Macでの実行成功を証明する検査ではありません。**

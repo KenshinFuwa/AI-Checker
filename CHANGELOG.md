@@ -1,3 +1,9 @@
+## v1.10.1 — isolated packaged AppKit startup smoke
+
+- GitHub macOS CI now runs an opt-in AppKit bootstrap directly from a mounted temporary DMG.
+- Verifies bundle ID, icon, launcher artwork, and menu-bar item creation without accounts, network, notifications, login items, or the normal event loop.
+- Does not establish actual first-run success on user hardware, Gatekeeper approval, or Intel runtime compatibility.
+
 ## v1.10.1 — optional free, unnotarized test preview (not an official release)
 
 - Added manually triggered macOS Universal 2 ad-hoc signed preview DMG builder and a separate seven-day test artifact workflow.

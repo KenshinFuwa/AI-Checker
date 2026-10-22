@@ -8,6 +8,7 @@ for file in scripts/*.sh; do bash -n "$file"; done
 python3 Tests/test_public_release.py
 python3 Tests/test_distribution_release.py
 python3 Tests/test_release_checksum.py
+python3 Tests/test_free_preview.py
 python3 Tests/test_release_invariants.py
 python3 Tests/test_consumer_web_integration.py
 python3 Tests/test_quota_notifications_integration.py

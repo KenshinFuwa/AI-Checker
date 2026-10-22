@@ -1,4 +1,4 @@
-> **Release status (2026-10-22):** Open-source v1.10.1 source beta is merged into `main`. GitHub Actions has passed portable Swift checks, native macOS builds/tests, and an unsigned Universal 2 (arm64 + x86_64) temporary-DMG layout audit. **No Developer ID-signed/notarized app or publicly downloadable DMG exists.** Source and locally built binaries are not a general-user installer; Intel and Apple Silicon clean-install testing remain outstanding.
+> **Release status (2026-10-22):** Open-source v1.10.1 source beta is merged into `main`. GitHub Actions has passed portable Swift checks, native macOS builds/tests, and an unsigned Universal 2 (arm64 + x86_64) temporary-DMG layout audit. **No Developer ID-signed/notarized app or official end-user DMG release exists.** An optional **manual, explicitly unnotarized test-only DMG** can be produced without Apple membership; this is not an official release and may be blocked by Gatekeeper. See [free preview cautions](docs/FREE_PREVIEW.ja.md). Intel and Apple Silicon clean-install testing remain outstanding.
 
 # AI Checker
 

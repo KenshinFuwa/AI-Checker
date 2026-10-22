@@ -1,3 +1,11 @@
+## v1.10.1 — distribution QA hardening (source only)
+
+- Added shared Universal 2 app staging and read-only mounted DMG layout audit.
+- CI audits disposable **unsigned** app/DMG geometry without uploading installers.
+- Signed distribution script re-audits the actual **notarized** and stapled DMG before copying to `dist/`.
+- Does not change AI Checker runtime behavior, user settings, credentials, or bundle ID.
+- Developer ID and notary credentials remain required; no public binary release created.
+
 ## v1.10.1 — Spotlight and icon recognition audit
 
 - Standardized explicit `.icns` resource, conventional `PkgInfo`, and signed-bundle preflight.

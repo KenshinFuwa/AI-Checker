@@ -55,6 +55,16 @@ class PublicSourceContracts(unittest.TestCase):
                 self.assertFalse(line.endswith((b' ', b'\t')),
                                  f'{file}:{index}: trailing whitespace')
 
+    def test_docs_do_not_claim_pre_merge_or_old_version(self):
+        readme=(ROOT/'README.md').read_text()
+        ja=(ROOT/'docs/README.ja.md').read_text()
+        self.assertNotIn('published `main` branch is currently v1.9.2', readme)
+        self.assertNotIn('macOS CI has not been confirmed green', readme)
+        self.assertNotIn('v1.9.9-beta.1）。', ja)
+        self.assertIn('No Developer ID-signed/notarized', readme)
+        self.assertIn('未公開', ja)
+        self.assertIn('checksum', (ROOT/'docs/DISTRIBUTION.md').read_text())
+
     def test_docs_and_ci(self):
         for f in ('README.md','SECURITY.md','LICENSE','PUBLICATION_CHECKLIST.md','docs/README.ja.md','docs/INSTALL.md','.github/workflows/mac-validation.yml'):
             self.assertTrue((ROOT/f).is_file(),f)

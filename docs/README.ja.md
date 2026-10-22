@@ -1,6 +1,6 @@
 # AI Checker — 日本語ガイド
 
-**macOS用メニューバー残量モニターのソース公開ベータ版（v1.9.9-beta.1）。** [英語README](../README.md)
+**macOS用メニューバー残量モニターのソース公開ベータ版（v1.10.1）。** [英語README](../README.md)
 
 - Codexは公式App Serverから、Claudeは公式Claude Code statusLineが利用量フィールドを提供する場合に限り、5時間・週間の残量とリセット時間を表示。
 - 表示形式：バー・数字・両方、名前表示、バー幅、AI間隔、配色をメニューから変更。枝分かれメニューを閉じずに操作可能。
@@ -8,7 +8,7 @@
 - GitHub Copilot／OpenAI API／Cursor Team／xAI API：請求量・管理API利用量であり、個人向けチャット枠ではない。
 - ChatGPT・Gemini・Perplexity・Cursor個人版・Grok個人版：公式サイトを既定ブラウザで開き、手動でメモできる。**残量自動取得ではない**。
 
-このソース公開版には、再配布権が未確認のCodex・Claude公式ロゴ画像を含めません。コード内のベクター代替マークを利用します。公開版は署名・公証済みアプリ配布ではありません。
+このソース公開版には、再配布権が未確認のCodex・Claude公式ロゴ画像を含めません。コード内のベクター代替マークを利用します。2026年10月22日時点でv1.10.1のソースはGitHubの`main`に反映済みで、macOS・Linux・Universal 2とDMGレイアウトのCIが成功しています。ただし**Developer ID署名・Apple公証済みアプリや一般ユーザー向けDMGは未公開**です。
 
 ## メニューバーがいっぱいになったとき
 
@@ -31,7 +31,7 @@ swift build --jobs 2 -c release
 
 Codex・Claudeアカウントはそれぞれ専用環境で扱い、APIキーはKeychainに保存します。GitHub公開ソース版はClaudeの非公開Web残量取得を搭載しません。Claude CodeのstatusLine連携のみ利用できます。
 
-[セキュリティ](../SECURITY.md) · [公開前チェックリスト](../PUBLICATION_CHECKLIST.md) · [変更履歴](../CHANGELOG.md)
+[セキュリティ](../SECURITY.md) · [公開前チェックリスト](../PUBLICATION_CHECKLIST.md) · [変更履歴](../CHANGELOG.md) · [配布QA](DISTRIBUTION.md)
 
 ## 著作権・ライセンス
 
@@ -43,7 +43,7 @@ Copyright © 2026 Kenshin Fuwa（不破憲伸）。[MIT License](../LICENSE) で
 
 ## Spotlightから開く（macOS）
 
-AI Checkerは通常 `~/Applications/AI Checker.app` にインストールされます。
+開発用のローカルインストーラは通常 `~/Applications/AI Checker.app` を対象とします。一般配布用の署名・公証済みDMGはまだありません。既存の署名付きアプリを無断で置換しないでください。
 ⌘Spaceを押し、`AI Checker` と入力してアプリを選択してください。
 すでに動作中のAI CheckerをSpotlightやFinderから再度開くと、利用状況パネルを表示します。
 検索結果に表示されない場合は、Finderで `~/Applications` を開いてインストール先を確認するか、ターミナルから `open "$HOME/Applications/AI Checker.app"` を実行してください。

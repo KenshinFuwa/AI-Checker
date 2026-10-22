@@ -1,3 +1,9 @@
+## v1.10.1 — optional free, unnotarized test preview (not an official release)
+
+- Added manually triggered macOS Universal 2 ad-hoc signed preview DMG builder and a separate seven-day test artifact workflow.
+- Preview is never published on GitHub Releases and never replaces the installed app; release signing/notarization remains a separate guarded route.
+- Added source contracts for manual acknowledgement, Gatekeeper non-bypass, and unnotarized warnings.
+
 ## v1.10.1 — source release clarity and checksum integrity gate
 
 - Corrected stale release-status claims in English/Japanese README after GitHub merges and green macOS CI.

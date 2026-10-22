@@ -32,3 +32,7 @@ The public source ZIP contains **no external logo PNGs**, no Keychain exports, n
 This repository is already public. Do **not** run the historic first-publication script again. From a fresh extracted feature ZIP on macOS, run `bash scripts/propose-github-beta.sh` to validate the native AppKit build, confirm `KenshinFuwa`, create an isolated feature branch, and open a pull request. It does not overwrite the local installed app or push to `main`. Inspect GitHub Actions and review the changes before merging.
 
 New installs should show a one-time usage panel with keyboard fallback instructions. The stable updater also copies the independent `Design/AppIcon.icns` into the signed app bundle before verifying the signature.
+
+## D. Manually generated UNNOTARIZED test preview (not an end-user release)
+
+For a controlled test on an isolated Mac, see [the explicit risk and build instructions](FREE_PREVIEW.ja.md). It uses only an ad-hoc signature and cannot establish the publisher identity. Do not overwrite an existing AI Checker app or disable Gatekeeper globally.

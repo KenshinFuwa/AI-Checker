@@ -1,0 +1,38 @@
+name: AI Checker unnotarized preview (manual test only)
+run-name: "Manual test preview — NOT APPLE NOTARIZED"
+on:
+  workflow_dispatch:
+    inputs:
+      acknowledge_unnotarized:
+        description: "Type UNNOTARIZED_TEST_ONLY (not Apple verified; test on isolated Mac)"
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  preview:
+    if: ${{ github.ref == 'refs/heads/main' && inputs.acknowledge_unnotarized == 'UNNOTARIZED_TEST_ONLY' }}
+    runs-on: macos-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify public source and native macOS tests
+        run: |
+          python3 scripts/verify-source-manifest.py
+          bash scripts/check.sh
+      - name: Build isolated, AD-HOC signed, unnotarized Universal 2 test DMG
+        run: bash scripts/build-free-preview-dmg.sh --acknowledge-unnotarized-preview
+      - name: Recheck preview checksum and artifact type
+        run: |
+          python3 scripts/verify-release-checksum.py "$PWD/dist/AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW.dmg" "$PWD/dist/AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW.dmg.sha256"
+          test -s dist/README-UNNOTARIZED-PREVIEW.txt
+      - name: Upload temporary test artifact (NOT GitHub Release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW-NOT-APPLE-VERIFIED
+          path: |
+            dist/AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW.dmg
+            dist/AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW.dmg.sha256
+            dist/README-UNNOTARIZED-PREVIEW.txt
+          if-no-files-found: error
+          retention-days: 7

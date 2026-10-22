@@ -8,7 +8,17 @@ Verify Xcode/Command Line Tools, `codesign`, `hdiutil`, `xcrun notarytool`, `xcr
 
 Check Apple guidance: [Developer ID](https://developer.apple.com/developer-id/) · [Notarization](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution).
 
-## 2. Isolated build (never overwrites an installed app)
+## 2. Universal 2 preflight — no Developer ID required
+
+From a Mac with Xcode selected, run:
+
+```bash
+bash scripts/check-universal-build.sh
+```
+
+This compiles release slices independently for `arm64` (Apple Silicon) and `x86_64` (Intel), merges them using `lipo`, checks both slices, and deletes all temporary outputs. The preflight does **not** install, sign, notarize, or publish an app. Passing a cross-architecture build does not prove that the Intel app runs on real Intel hardware; this remains a release gate.
+
+## 3. Isolated build (never overwrites an installed app)
 
 ```bash
 export AI_CHECKER_DEVELOPER_ID='Developer ID Application: YOUR LEGAL CERTIFICATE NAME (TEAMID)'
@@ -18,11 +28,11 @@ export AI_CHECKER_NOTARY_PROFILE='YOUR_EXISTING_NOTARYTOOL_KEYCHAIN_PROFILE'
 
 Both values above are **placeholders**; do not copy them without substituting your real Keychain identity/profile. The script refuses a missing or non-Developer-ID certificate. It runs source verification, offline tests, native macOS release build, hardened-runtime signing with Apple timestamp, notarization with `notarytool`, staples and validates the DMG, verifies the image, and finally writes `dist/AI-Checker-v1.10.1-notarized.dmg` plus a SHA-256 checksum. If any check fails, no release artifact is published. It never calls `gh release` or modifies `/Applications`.
 
-## 3. Mandatory release gates
+## 4. Mandatory release gates
 
 - [ ] Apple notary status **Accepted**, `stapler validate` PASS and signing chain/Team ID verified.
 - [ ] Install the DMG on a second/clean Mac and verify Gatekeeper, Spotlight search, app icon, Accessibility-free shortcut and all notification permissions.
-- [ ] Check Apple silicon and Intel behavior as supported (the DMG is built for the host Mac architecture unless universal packaging is independently implemented and tested).
+- [ ] Confirm `lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64` PASS on the signed executable inside the DMG; then test on real Apple Silicon and Intel Macs. The CI universal preflight only checks compilation, not hardware execution.
 - [ ] Review privacy and account connection behavior; no test keys or private Web session access in the public build.
 - [ ] **Upgrade/migration**: prior locally signed apps may have a different designated requirement; their login item and Keychain storage might require explicit migration. Do not overwrite them silently or claim seamless upgrades.
 - [ ] Verify security vulnerability reporting, README download instructions, checksums and release notes before a GitHub Release.

@@ -12,7 +12,7 @@ PROFILE="${AI_CHECKER_NOTARY_PROFILE:-}"
     exit 2
 }
 [[ -n "$PROFILE" ]] || { echo 'HOLD: set AI_CHECKER_NOTARY_PROFILE to a pre-existing notarytool Keychain profile.' >&2; exit 2; }
-for tool in swift swiftc python3 codesign security xcrun hdiutil plutil sips shasum; do
+for tool in swift swiftc python3 codesign security xcrun hdiutil plutil sips shasum lipo; do
     command -v "$tool" >/dev/null || { echo "ERROR: missing $tool" >&2; exit 2; }
 done
 security find-identity -v -p codesigning | grep -F -- "$IDENTITY" >/dev/null || {
@@ -21,14 +21,15 @@ security find-identity -v -p codesigning | grep -F -- "$IDENTITY" >/dev/null || 
 [[ -s Design/AppIcon.icns ]] || { echo 'ERROR: missing original AppIcon.icns.' >&2; exit 2; }
 python3 scripts/verify-source-manifest.py
 bash scripts/check.sh
-BIN_DIR="$(swift build --jobs 2 -c release --show-bin-path)"
-[[ -x "$BIN_DIR/AIChecker" ]] || { echo 'ERROR: release executable missing.' >&2; exit 3; }
 TEMP="$(mktemp -d "${TMPDIR:-/tmp/}aichecker-public-release.XXXXXXXX")"
 cleanup(){ rm -rf "$TEMP"; }
 trap cleanup EXIT
 APP="$TEMP/AI Checker.app"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN_DIR/AIChecker" "$APP/Contents/MacOS/AIChecker"
+# Build both slices in isolation and combine BEFORE Developer ID signing.
+bash scripts/build-universal-binary.sh "$TEMP/AIChecker-universal"
+cp "$TEMP/AIChecker-universal" "$APP/Contents/MacOS/AIChecker"
+lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64
 chmod 755 "$APP/Contents/MacOS/AIChecker"
 cp scripts/release/Info.plist "$APP/Contents/Info.plist"
 cp Design/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
@@ -38,6 +39,7 @@ sips -g pixelWidth -g pixelHeight "$APP/Contents/Resources/AppIcon.icns" >/dev/n
 # --options runtime and a timestamp are required for notarizable Developer ID output.
 codesign --force --sign "$IDENTITY" --options runtime --timestamp "$APP"
 codesign --verify --strict --verbose=2 "$APP"
+lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64
 codesign -dv --verbose=4 "$APP" 2> "$TEMP/signing.txt"
 grep -F 'Authority=Developer ID Application:' "$TEMP/signing.txt" >/dev/null || {
     echo 'ERROR: signed app is not identified by Developer ID Application.' >&2; exit 3;

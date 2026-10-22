@@ -25,17 +25,9 @@ TEMP="$(mktemp -d "${TMPDIR:-/tmp/}aichecker-public-release.XXXXXXXX")"
 cleanup(){ rm -rf "$TEMP"; }
 trap cleanup EXIT
 APP="$TEMP/AI Checker.app"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-# Build both slices in isolation and combine BEFORE Developer ID signing.
+# Shared staging path: identical app layout to the unsigned macOS CI preflight.
 bash scripts/build-universal-binary.sh "$TEMP/AIChecker-universal"
-cp "$TEMP/AIChecker-universal" "$APP/Contents/MacOS/AIChecker"
-lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64
-chmod 755 "$APP/Contents/MacOS/AIChecker"
-cp scripts/release/Info.plist "$APP/Contents/Info.plist"
-cp Design/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
-printf 'APPL????' > "$APP/Contents/PkgInfo"
-plutil -lint "$APP/Contents/Info.plist"
-sips -g pixelWidth -g pixelHeight "$APP/Contents/Resources/AppIcon.icns" >/dev/null
+bash scripts/stage-release-app.sh "$TEMP/AIChecker-universal" "$APP"
 # --options runtime and a timestamp are required for notarizable Developer ID output.
 codesign --force --sign "$IDENTITY" --options runtime --timestamp "$APP"
 codesign --verify --strict --verbose=2 "$APP"
@@ -69,6 +61,8 @@ PYVERIFY
 xcrun stapler staple -v "$DMG"
 xcrun stapler validate -v "$DMG"
 hdiutil verify "$DMG" >/dev/null
+# Independently mount and inspect the signed, notarized, stapled DMG.
+bash scripts/audit-release-dmg.sh --signed-release "$DMG"
 mkdir -p "$ROOT/dist"
 OUTPUT="$ROOT/dist/AI-Checker-v1.10.1-notarized.dmg"
 [[ ! -e "$OUTPUT" ]] || { echo 'ERROR: distribution artifact already exists; refuse overwrite.' >&2; exit 3; }

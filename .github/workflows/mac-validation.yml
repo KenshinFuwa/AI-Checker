@@ -36,14 +36,14 @@ jobs:
           swift build --jobs 2 -c release
           echo 'This is NOT a Developer ID-signed/notarized binary release.'
   universal-macos:
-    name: Universal 2 arm64 + Intel x86_64 (macOS, no signing)
+    name: Universal 2 + DMG layout audit (macOS, no signing)
     runs-on: macos-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - name: Verify non-secret source manifest
         run: python3 scripts/verify-source-manifest.py
-      - name: Independently build and verify both architectures
+      - name: Build Universal 2, stage app, mount and audit temporary DMG
         run: bash scripts/check-universal-build.sh
       - name: Note distribution status
         run: echo 'This job produces no distributable app; Developer ID and notarization remain mandatory.'

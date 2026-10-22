@@ -1,6 +1,6 @@
 # AI Checker — 日本語ガイド
 
-**macOS用メニューバー残量モニターのソース公開ベータ版（v1.9.2-beta.3）。** [英語README](../README.md)
+**macOS用メニューバー残量モニターのソース公開ベータ版（v1.9.9-beta.1）。** [英語README](../README.md)
 
 - Codexは公式App Serverから、Claudeは公式Claude Code statusLineが利用量フィールドを提供する場合に限り、5時間・週間の残量とリセット時間を表示。
 - 表示形式：バー・数字・両方、名前表示、バー幅、AI間隔、配色をメニューから変更。枝分かれメニューを閉じずに操作可能。
@@ -9,6 +9,14 @@
 - ChatGPT・Gemini・Perplexity・Cursor個人版・Grok個人版：公式サイトを既定ブラウザで開き、手動でメモできる。**残量自動取得ではない**。
 
 このソース公開版には、再配布権が未確認のCodex・Claude公式ロゴ画像を含めません。コード内のベクター代替マークを利用します。公開版は署名・公証済みアプリ配布ではありません。
+
+## メニューバーがいっぱいになったとき
+
+- 「省スペース・ショートカット → メニューバーの表示」で、通常／省スペース（数字のみ）／アイコンのみを切り替えられます。
+- 既定の **⌃⌥⌘A**（Control + Option + Command + A）で、メニューバーに表示されていなくても利用状況パネルを開けます。競合する場合は **⌃⌥⌘U** に変更、またはOFFにできます。
+- 「メニューバーの整理方法…」から、macOSの設定と他のアプリの設定変更を案内します。他アプリのアイコンは操作せず、アクセシビリティ権限も要求しません。
+- 空きスペースの自動検出は行いません。初回導入時にも使い方が分かるよう、初回起動時にパネルを一度表示します。
+- アプリアイコンは独自のゲージ＋チェックで、各AIサービスの公式ロゴを再配布しません。
 
 ## 開発環境
 
@@ -27,8 +35,21 @@ Codex・Claudeアカウントはそれぞれ専用環境で扱い、APIキーは
 
 ## 著作権・ライセンス
 
-Copyright © 2026 Kenshin Fuwa（不破憲伸）。[MIT License](../LICENSE) で公開予定です。公開の可否については [公開前チェックリスト](../PUBLICATION_CHECKLIST.md) も確認してください。
+Copyright © 2026 Kenshin Fuwa（不破憲伸）。[MIT License](../LICENSE) で公開しています。公開の可否については [公開前チェックリスト](../PUBLICATION_CHECKLIST.md) も確認してください。
 
 ## 公開版とローカル版の差分
 
 公開版ではClaudeの非公開Web使用量APIへの自動アクセスを無効化しています。Claude CodeのstatusLineが提供する利用量データのみ取り込みます。ローカル実験版v1.9.2とは機能が異なります。
+
+## Spotlightから開く（macOS）
+
+AI Checkerは通常 `~/Applications/AI Checker.app` にインストールされます。
+⌘Spaceを押し、`AI Checker` と入力してアプリを選択してください。
+すでに動作中のAI CheckerをSpotlightやFinderから再度開くと、利用状況パネルを表示します。
+検索結果に表示されない場合は、Finderで `~/Applications` を開いてインストール先を確認するか、ターミナルから `open "$HOME/Applications/AI Checker.app"` を実行してください。
+Spotlightのインデックス更新には時間がかかる場合があります。
+Dockに常駐しないのはメニューバーアプリの仕様です。
+
+## 通信速度とSpotlight
+
+「AI CHECKER / USAGE」を開くと計測を自動開始し、約0.5秒後の初回結果以降は1秒ごとに更新します。閉じると停止します。速度テストではありません。Spotlight検索に表示されない場合は `bash scripts/diagnose-spotlight.sh` で診断し、必要に応じて `bash scripts/migrate-spotlight-app.sh` で署名を保持して `/Applications` に移行できます（管理者承認・明示的な確認が必要）。検索結果への表示はmacOSで最終確認してください。

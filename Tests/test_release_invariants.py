@@ -45,7 +45,7 @@ class ReleaseInvariants(unittest.TestCase):
     def test_identity_and_upgrade_signature(self):
         installer = source('scripts/install-local.sh')
         self.assertIn('dev.aichecker.localapp', installer)
-        self.assertIn('<string>1.9.2</string>', installer)
+        self.assertIn('<string>1.10.1</string>', installer)
         self.assertIn('get_req "$DEST"', installer)
         self.assertNotIn('tccutil reset', installer)
 

@@ -1,21 +1,37 @@
-name: macOS Swift validation
+name: AI Checker source validation
 on:
   push:
+    branches: [main, 'release/**', 'feature/**']
   pull_request:
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  mac-build-and-tests:
-    runs-on: macos-latest
-    timeout-minutes: 25
+  core-linux:
+    name: Swift core and source checks (Ubuntu)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - name: Toolchain
         run: |
           swift --version
           python3 --version
-      - name: Source/privacy distribution gate
-        run: python3 Tests/test_public_release.py
-      - name: Full offline checks and native macOS build
+      - name: Portable Swift core and source checks (no macOS-only RPC)
+        run: bash scripts/check-source-core.sh
+  mac-native:
+    name: Native AppKit build and tests (macOS)
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          swift --version
+          python3 --version
+      - name: Full native checks
         run: bash scripts/check.sh
+      - name: Show signing-free release build information
+        run: |
+          swift build --jobs 2 -c release
+          echo 'This is NOT a Developer ID-signed/notarized binary release.'

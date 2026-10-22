@@ -58,27 +58,43 @@ struct StatusArtwork {
     static func render(_ snapshots: [String: AIQuotaSnapshot], stale: Bool,
                        demo: Bool, preferences: AICheckerSettings,
                        catalog: [AIProviderDescriptor],
-                       monthlyCopilotUsage: CopilotPremiumUsage? = nil) -> NSImage? {
+                       monthlyCopilotUsage: CopilotPremiumUsage? = nil,
+                       monthlyAPIReports: [String] = []) -> NSImage? {
         let geometry = layout(for: preferences, catalog: catalog)
-        guard !geometry.slots.isEmpty else { return nil }
         // Monthly count is a different metric from 5h/weekly remaining. It is
         // appended as a labelled text meter only when the user opts in.
         let countLabel = monthlyCopilotUsage.map {
             "GH " + String(format: "%.1f", $0.grossRequests) + " req"
         }
-        let extraWidth: CGFloat = countLabel.map { measure($0, font: rowFont) + 6 } ?? 0
+        // These are monthly API/billing counts, NEVER 5h/Week percentages.
+        let reportLabels = ([countLabel].compactMap { $0 } + monthlyAPIReports)
+            .filter { !$0.isEmpty && $0.count <= 32 }
+        guard !geometry.slots.isEmpty || !reportLabels.isEmpty else { return nil }
+        let extraWidth = reportLabels.reduce(CGFloat(0)) { $0 + measure($1, font: rowFont) + 7 }
         let img = NSImage(size: NSSize(width: geometry.width + extraWidth, height: height), flipped: false) { _ in
             for slot in geometry.slots {
                 draw(slot, snapshots: snapshots, stale: stale, preferences: preferences)
             }
-            if let countLabel = countLabel {
-                text(countLabel, x: geometry.width + 6, y: 8, font: rowFont, color: .secondaryLabelColor)
+            var offset = geometry.width
+            for label in reportLabels {
+                text(label, x: offset + 7, y: 8, font: rowFont, color: .secondaryLabelColor)
+                offset += measure(label, font: rowFont) + 7
             }
             if demo { text("•", x: max(0, geometry.width + extraWidth - 5), y: 0, font: rowFont, color: .systemOrange) }
             return true
         }
         img.isTemplate = false
         return img
+    }
+
+    static func renderLauncherIcon() -> NSImage? {
+        let icon = NSImage(size: NSSize(width: 23, height: height), flipped: false) { _ in
+            // A small independent mark remains recognizable even without a status meter.
+            AICheckerBrandArtwork.draw(in: NSRect(x: 0, y: 2, width: 23, height: 23))
+            return true
+        }
+        icon.isTemplate = false
+        return icon
     }
 
     private static func text(_ text: String, x: CGFloat, y: CGFloat, font: NSFont, color: NSColor) {

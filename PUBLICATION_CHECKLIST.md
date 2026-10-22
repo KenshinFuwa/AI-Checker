@@ -1,6 +1,17 @@
+> Current release gates: [docs/PUBLISH_PR.md](docs/PUBLISH_PR.md) and [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md). The following checklist is historical and may include outdated pre-publication steps.
+
+## v1.9.5-beta.1 feature review (not yet merged)
+
+- [x] Original app icon with no third-party logos (PNG + ICNS).
+- [x] User-controlled standard/compact/icon-only status modes; no screen-space inference.
+- [x] System hotkey uses Carbon RegisterEventHotKey, no keyboard events captured.
+- [x] On-demand standalone usage panel and help, first-launch visibility fallback.
+- [ ] Native macOS build + first-run UI + shortcut collision tests on the user Mac.
+- [ ] Pull request reviewed, GitHub macOS CI passes, then merge into `main`.
+
 # Public repository release checklist
 
-## Blocking decisions before making repository public
+## Historical initial-publication checklist (repository now public)
 
 - [x] **Confirm LICENSE attribution/rights.** Project author confirmed sole copyright ownership and authorized the MIT notice **Copyright (c) 2026 Kenshin Fuwa** on 2026-10-20. Check any subsequently imported third-party code separately.
 - [x] **Disable undocumented Claude Web quota polling in public source**. Current Anthropic Consumer Terms restrict automated access unless expressly permitted. The local experimental build is not published unchanged.

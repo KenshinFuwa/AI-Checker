@@ -1,10 +1,14 @@
+> **Release status (2026-10-22):** Open-source beta. The published `main` branch is currently v1.9.2-beta.3; v1.10.1 is a *proposed source update* until its pull request is merged. No Developer ID-signed/notarized binary or end-user DMG has been released. Source and local developer builds are not a general-user installer. macOS CI has not been confirmed green.
+
 # AI Checker
 
-**Native macOS menu-bar usage monitor — source-only beta (`v1.9.2-beta.3`).**
+**Native macOS menu-bar usage monitor — source-only beta (`v1.10.1-beta.1`).**
 
 [日本語ガイド](docs/README.ja.md) · [Security](SECURITY.md) · [Build & release checklist](PUBLICATION_CHECKLIST.md) · [Changelog](CHANGELOG.md)
 
-AI Checker shows **Codex** and **Claude** usage windows in a compact menu-bar display. It supports native cascading menus, live appearance changes, adjustable bar/number widths, reset/depletion notifications, multiple profiles, and explicit usage data sources.
+AI Checker shows **Codex** and **Claude** usage windows in a compact menu-bar display. It supports native cascading menus, live appearance changes, three menu-bar densities, adjustable bar/number widths, reset/depletion notifications, multiple profiles, and explicit usage data sources.
+
+The v1.9.9-beta.1 patch fixes a macOS Carbon `GetEventParameter` argument-type error from the earlier feature candidate.
 
 This is an **independent, unofficial project**. It is not affiliated with, sponsored by, or endorsed by OpenAI, Anthropic, or other providers.
 
@@ -22,6 +26,14 @@ This is an **independent, unofficial project**. It is not affiliated with, spons
 
 Unknown or stale usage is not displayed as a fabricated percentage. Notifications only apply to monitored, automatically reported Codex/Claude account windows.
 
+## When the menu bar is full
+
+- Choose **Appearance → Space & shortcut → Menu-bar display** and switch between **Standard**, **Compact** (provider icons and numbers), and **Icon only** (the AI Checker gauge).
+- Press **Control + Option + Command + A** (default) to open the separate usage panel even when AI Checker is hidden in an overfull macOS menu bar. You may disable it or choose **Control + Option + Command + U** if another app uses the shortcut. The shortcut is registered with the macOS system hotkey API and requests **no Accessibility permission**.
+- Use **Space & shortcut → Menu-bar organization guide** for directions to macOS System Settings and other apps' own menu-bar preferences.
+- AI Checker does **not** detect every other status item's visibility, move or hide other apps' icons, or require global keyboard event monitoring. Do not claim automatic available-width detection.
+- The app ships its own navy-and-teal progress-ring/check `AppIcon.icns`, not any provider's trademarked icon.
+
 ## Requirements
 
 - macOS 13 or newer (some optional local WebKit account-management features may require newer macOS).
@@ -32,7 +44,7 @@ Unknown or stale usage is not displayed as a fabricated percentage. Notification
 ## Build from source
 
 ```bash
-git clone https://github.com/KenshinFuwa/AI-Checker.git  # after this repository is published
+git clone https://github.com/KenshinFuwa/AI-Checker.git
 cd AI-Checker
 ./scripts/check.sh
 swift build -c release --jobs 2
@@ -48,7 +60,7 @@ There is **no notarized `.dmg` / public installer** in this source-only beta. Do
 ./scripts/check.sh
 ```
 
-The script runs Swift unit tests, Python policy/regression tests, a local Codex App Server mock and macOS native checks when running on a Mac. CI also runs this script on GitHub-hosted macOS. Real provider logins, real notification delivery and macOS menu interaction require separate interactive testing.
+The script runs Swift unit tests, Python policy/regression tests, a local Codex App Server mock and macOS native checks when running on a Mac. GitHub Actions has separate **portable Linux source/core** and **native macOS** jobs. The Linux job excludes the Codex RPC integration test; only the Mac job runs the full `check.sh`. Both must actually pass before merge. Real provider logins, real notification delivery and macOS menu interaction require separate interactive testing.
 
 ## Data and privacy
 
@@ -69,6 +81,47 @@ Copyright © 2026 Kenshin Fuwa. Released under the [MIT License](LICENSE), as co
 
 The local/private v1.9.2 app and this source-only public beta are **not feature-identical**. This repository **does not** include live access to undocumented Claude Web quota endpoints. Official Claude Code `statusLine` remains available where its supplied fields permit quota reporting. A local install may display no Claude percentage until statusLine data is present. See the [provider terms](https://www.anthropic.com/legal/consumer-terms).
 
-## Maintainer publication
+## Feature preview / contributing
 
-On macOS, from the extracted source directory, run `bash scripts/publish-github.sh`. It performs macOS validation and a guarded `gh repo create` for `KenshinFuwa/AI-Checker`, using a GitHub-generated `noreply` author email (repository-local setting only). The process will explicitly request confirmation before creating a **public** repository and pushing its source-only beta tag.
+The source code is already public at `KenshinFuwa/AI-Checker`. The historical `scripts/publish-github.sh` is for the initial release only; **do not rerun it**. After local macOS native checks, maintainers can run `bash scripts/propose-github-beta.sh` from a fresh extracted candidate to create a feature branch and pull request. This does not push to `main` or publish an executable. Review the GitHub Actions results before merging.
+
+## End-user distribution
+
+See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) for guarded Developer ID signing and notarization. **No signed DMG is currently available.** The author’s successful Spotlight test required restarting the Mac’s Spotlight indexing services; the app did not fix Spotlight by itself.
+
+## Spotlight app discovery
+
+After installation, the installer explicitly registers AI Checker with macOS Launch Services.
+To repair an existing signed installation without rebuilding, run:
+
+```bash
+bash scripts/repair-spotlight.sh
+```
+
+Search for **AI Checker** in Spotlight (not **AIChecker.QuotaStatus.v1**, which is a window title).
+If the application is still missing, inspect macOS Spotlight Applications visibility and privacy settings.
+The OS controls indexing and this helper cannot guarantee search placement.
+
+## On-demand network speed and Spotlight discovery (v1.9.6 beta)
+
+Opening **AI CHECKER / USAGE** automatically starts network-speed measurements. The first download/upload reading appears after about 0.5 seconds; subsequent readings update once per second while the menu is open. Closing the menu stops the sampler. There is no idle polling or generated test traffic. One interface is selected to avoid VPN/physical double counting; this is not a bandwidth benchmark.
+
+If the app installed under `~/Applications` is not searchable in Spotlight, `scripts/diagnose-spotlight.sh` checks bundle metadata and indexes only that app. For persistent non-discovery, `scripts/migrate-spotlight-app.sh` optionally migrates the signed app to `/Applications` after explicit confirmation; it may require administrator authentication. It preserves the existing bundle identifier and signing identity. Do not run it with duplicate apps already installed. Verify Spotlight results on the Mac; the source cannot override the OS search database.
+
+
+## v1.9.9: on-demand speed smoothing and Spotlight
+
+Initial speed after 0.5s; one counter read per second; a weighted 2-second average is drawn only once per 2 seconds while the USAGE menu is open. When closed, throughput polling is stopped. Spotlight search remains dependent on macOS indexing: see `START_HERE.md`.
+
+
+## Menu-bar provider selection (v1.10.1)
+
+In Display Settings → メニューバーに表示するAI, choose Codex, Claude, or configured official billing/API report connections. Newly connected services are opt-in, and missing monthly reports are shown as `—`, not guessed percentages. ChatGPT, Gemini, Perplexity, Cursor consumer, and Grok consumer have no automated personal quota readers. GitHub Copilot and API usage reports are separate monthly counters, not 5h/Week quotas. Changing providers never modifies account tokens or authentication.
+
+## Spotlight / Finder application icon (v1.10.1)
+
+This release standardizes the signed `.app` bundle icon (`CFBundleIconFile=AppIcon.icns`, `PkgInfo=APPL????`) and explicitly supplies the icon to AppKit on startup. This protects source packaging without changing the Bundle ID, signed identity, account storage, startup item, or quota acquisition.
+
+The earlier Mac diagnosis showed that the icon resource and importer were valid **but that the installed app was missing from the Spotlight search index**. This is not proof that the app can repair Spotlight itself. Run `bash scripts/diagnose-app-identity.sh` after installation: it separately checks the bundle icon, Launch Services, AppKit-resolved icon, and Spotlight indexing, including comparison with system apps. No automatic whole-disk Spotlight resets or disruptive cache kills are performed.
+
+A macOS-native build, Finder icon, Notification Center icon, and actual Spotlight UI search all require final testing on a Mac. A passing Linux/Swift core test is not a claim that the OS indexing issue has been fixed.

@@ -28,3 +28,7 @@ Sources/AIChecker/Assets/*.png
 __pycache__/
 *.pyc
 *.pyo
+# Editor backup files must never be packaged or committed.
+*.orig
+*.bak
+*.swp

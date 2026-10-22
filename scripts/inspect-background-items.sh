@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-./scripts/cleanup-legacy.sh --dry-run
+bash scripts/cleanup-legacy.sh --dry-run
 if [[ "$(uname -s)" == Darwin ]] && command -v sfltool >/dev/null; then
   echo
   echo 'Old macOS background item records (read-only; excerpts may contain local paths):'

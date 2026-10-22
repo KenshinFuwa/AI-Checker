@@ -27,9 +27,8 @@ This source beta does not provide a DMG/PKG or notarized build. A future release
 
 The public source ZIP contains **no external logo PNGs**, no Keychain exports, no tokens and no local account directories. A fresh source build will use source-defined fallback glyphs. No secrets should be entered into GitHub Actions logs or checked into the repo.
 
-## First GitHub publication by repository owner
+## Contributing a feature beta after publication
 
-Run `bash scripts/publish-github.sh` from this extracted public-source folder.
-It validates source and macOS compilation, previews staged files and, after
-explicit confirmation, creates `KenshinFuwa/AI-Checker` and pushes the tag.
-It does not install or overwrite the locally working AI Checker app.
+This repository is already public. Do **not** run the historic first-publication script again. From a fresh extracted feature ZIP on macOS, run `bash scripts/propose-github-beta.sh` to validate the native AppKit build, confirm `KenshinFuwa`, create an isolated feature branch, and open a pull request. It does not overwrite the local installed app or push to `main`. Inspect GitHub Actions and review the changes before merging.
+
+New installs should show a one-time usage panel with keyboard fallback instructions. The stable updater also copies the independent `Design/AppIcon.icns` into the signed app bundle before verifying the signature.

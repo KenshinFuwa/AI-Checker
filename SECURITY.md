@@ -1,6 +1,6 @@
 # Security policy
 
-**Status:** source-only beta (`v1.9.2-beta.3`); not an independently audited security product.
+**Status:** source-only beta; current published main is `v1.9.2-beta.3`, and `v1.10.1` is a proposed update, not yet independently audited.
 
 Please **do not open public issues containing credentials, cookies, tokens, server addresses, or private account details**. If you suspect a vulnerability, contact the repository maintainer privately using GitHub's private vulnerability reporting (when enabled) or another verified private contact method.
 

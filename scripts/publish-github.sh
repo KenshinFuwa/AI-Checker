@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 OWNER="KenshinFuwa"
 NAME="AI-Checker"
 REPOSITORY="$OWNER/$NAME"
-TAG="v1.9.2-beta.3"
+TAG="v1.9.2-beta.3"  # historic INITIAL publisher only; do not reuse for updates
 
 echo "AI Checker publication: $REPOSITORY ($TAG)"
 if [[ "$(uname -s)" != Darwin ]]; then

@@ -40,6 +40,21 @@ class PublicSourceContracts(unittest.TestCase):
         self.assertIn('git diff --cached --check',script)
         self.assertIn('users.noreply.github.com',script)
 
+    def test_public_source_has_no_git_whitespace_errors(self):
+        # Catch release-blocking whitespace before cloning/pushing to GitHub.
+        ignored = {'.git', '.build', '.swiftpm', 'dist', '__pycache__'}
+        suffixes = {'.md', '.swift', '.py', '.sh', '.yml', '.yaml', '.json', '.txt'}
+        for file in ROOT.rglob('*'):
+            if not file.is_file() or any(part in ignored for part in file.relative_to(ROOT).parts):
+                continue
+            if file.suffix not in suffixes:
+                continue
+            data = file.read_bytes()
+            self.assertFalse(data.endswith(b'\n\n'), f'{file}: blank line at EOF')
+            for index, line in enumerate(data.splitlines(), start=1):
+                self.assertFalse(line.endswith((b' ', b'\t')),
+                                 f'{file}:{index}: trailing whitespace')
+
     def test_docs_and_ci(self):
         for f in ('README.md','SECURITY.md','LICENSE','PUBLICATION_CHECKLIST.md','docs/README.ja.md','docs/INSTALL.md','.github/workflows/mac-validation.yml'):
             self.assertTrue((ROOT/f).is_file(),f)

@@ -53,7 +53,7 @@ class ConsumerWebTests(unittest.TestCase):
         self.assertIn('DispatchQueue.main.async',main)
 
     def test_version_and_docs_explicit(self):
-        self.assertIn('<string>1.9.2</string>',(ROOT/'scripts/install-local.sh').read_text())
+        self.assertIn('<string>1.10.1</string>',(ROOT/'scripts/install-local.sh').read_text())
         for fn in ['docs/legacy/README_FIRST.md','docs/legacy/README_JA.md']:
             t=(ROOT/fn).read_text()
             self.assertIn('AI-Checker-v1.9.2.zip',t)

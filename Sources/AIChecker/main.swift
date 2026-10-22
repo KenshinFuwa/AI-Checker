@@ -6,6 +6,8 @@ import AICheckerCore
 final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem?
     private var menuIsTracking = false
+    private let networkSpeed = OnDemandNetworkSpeed()
+    private weak var speedHeader: UsageSpeedHeaderView?
     private var liveMenuRows: [StayOpenMenuRow] = []
     private var pendingMenuRefresh = false
     private var refreshTimer: Timer?
@@ -51,22 +53,41 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
     private let legacyPreferencesKey = "MenuPilot.v03.displayPreferences"
     private let loginPreferenceKey = "AIChecker.v1.launchAtLogin"
     private let copilotMenuBarKey = "AIChecker.v16.copilotMenuBar"
+    // Selection is separate from credentials and quota snapshots; old display JSON stays compatible.
+    private let apiMenuBarSelectionKey = "AIChecker.v110.apiMenuBarSelection"
+    private var selectedAPIMenuBarIDs = Set<String>()
     private let copilotAccessKey = "AIChecker.v163.copilotAccessMode"
     private var wantsLaunchAtLogin = true
     private var loginRegistrationError: String?
     private var preferences = AICheckerSettings()
+    // Explicit user-controlled fallback; macOS does not expose reliable status-item occlusion.
+    private let menuBarModeKey = "AIChecker.v193.menuBarMode"
+    private let shortcutEnabledKey = "AIChecker.v193.globalShortcutEnabled"
+    private let shortcutPresetKey = "AIChecker.v193.shortcutPreset"
+    private var menuBarMode: MenuBarPresentation = .standard
+    private var shortcutEnabled = true
+    private var shortcutPreset: QuickPanelShortcut = .defaultShortcut
+    private let globalHotkey = GlobalUsageHotkey()
+    private let quickPanel = UsageQuickPanel()
     private let demo = ProcessInfo.processInfo.environment["AI_CHECKER_DEMO"] == "1"
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Explicitly load the signed bundle icon for AppKit UI surfaces.
+        // Finder/Spotlight/Notification Center may have independent OS caches;
+        // this does not modify those caches or the installed app signature.
+        configureApplicationIcon()
         installStandardEditCommands()
         loadPreferences()
+        loadQuickAccessPreferences()
         loadAccounts()
         loadCopilotAccessMode()
         loadConsumerNotes()
         loadQuotaNotifications()
+        loadAPIMenuBarSelection()
         configureLaunchAtLogin()
         subscribeToPowerEvents()
         createStatusItem()
+        configureQuickAccess()
         for unsupported in AIProviderRegistry.planned where !AIProviderRegistry.supportsUsageReport(unsupported.id) {
             providerHealth.setAuth(unsupported.id, .unsupported)
         }
@@ -87,6 +108,33 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         renderUI()
         if !demo { refresh(force: true) }
         startRefreshTimer()
+        // One-time discoverability: if the menu bar is full on first launch,
+        // the user still learns the keyboard entry point to this independent panel.
+        if !demo && !UserDefaults.standard.bool(forKey: "AIChecker.v193.quickAccessWelcomeShown") {
+            UserDefaults.standard.set(true, forKey: "AIChecker.v193.quickAccessWelcomeShown")
+            DispatchQueue.main.async { [weak self] in self?.showQuickPanel() }
+        }
+    }
+
+    /// Opening AI Checker again from Spotlight or Finder must reveal a window
+    /// even when macOS has hidden the status item due to menu-bar crowding.
+    /// Reopening an already running LSUIElement app should not spawn another
+    /// process or alter user preferences, accounts, or notification state.
+    func applicationShouldHandleReopen(_ sender: NSApplication,
+                                       hasVisibleWindows flag: Bool) -> Bool {
+        DispatchQueue.main.async { [weak self] in
+            self?.showQuickPanel()
+        }
+        return false  // The quick panel handles its own focus/visibility.
+    }
+
+    private func configureApplicationIcon() {
+        guard let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
+              let icon = NSImage(contentsOf: iconURL), icon.isValid else {
+            NSLog("AI Checker: signed app icon resource is unavailable")
+            return
+        }
+        NSApp.applicationIconImage = icon
     }
 
     // Accessory/menu-bar-only apps do not necessarily have the standard Edit menu.
@@ -119,13 +167,19 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         refreshItem.target = self
         refreshItem.keyEquivalentModifierMask = [.command]
         actionsMenu.addItem(refreshItem)
+        let panelItem = NSMenuItem(title: "利用状況パネルを開く", action: #selector(showQuickPanel), keyEquivalent: "")
+        panelItem.target = self
+        actionsMenu.addItem(panelItem)
         mainMenu.addItem(actionsItem)
         mainMenu.setSubmenu(actionsMenu, for: actionsItem)
         NSApp.mainMenu = mainMenu
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        networkSpeed.stop()
         stopRefreshTimer()
+        globalHotkey.unregister()
+        quickPanel.close()
         codexClient?.stopAndWait()
         claudeWebClient?.stop()
         copilotClient.stop()
@@ -163,6 +217,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
     @objc private func willSleep(_ notification: Notification) {
         sleeping = true
         providerHealth.sleep()
+        networkSpeed.stop()
         stopRefreshTimer()
         codexClient?.stopAndWait()
         copilotClient.stop()
@@ -179,6 +234,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         externalClients.values.forEach { $0.resume() }
         connectSelectedAccount()
         configureClaudeWebSession()
+        if menuIsTracking { startMenuNetworkSpeed() }
         startRefreshTimer()
         if fetching {
             refreshAfterWake = true
@@ -211,7 +267,6 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
            let saved = try? JSONDecoder().decode(AICheckerSettings.self, from: data) {
             preferences = saved
             preferences.visibleProviderIDs.removeAll { !AIProviderRegistry.isImplemented($0) }
-            if preferences.visibleProviderIDs.isEmpty { preferences.setVisible("codex", true) }
             return
         }
         // Read old preferences, but do not inherit menu-bar AX/accessibility settings.
@@ -230,6 +285,113 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         }
         lastDisplayKey = nil // settings affect artwork even if usage values did not change
         renderUI()
+    }
+
+    private func loadQuickAccessPreferences() {
+        if let raw = UserDefaults.standard.string(forKey: menuBarModeKey),
+           let mode = MenuBarPresentation(rawValue: raw) { menuBarMode = mode }
+        // Enabled by default, but never change system-wide keyboard settings.
+        if let value = UserDefaults.standard.object(forKey: shortcutEnabledKey) as? Bool {
+            shortcutEnabled = value
+        }
+        if let raw = UserDefaults.standard.string(forKey: shortcutPresetKey),
+           let preset = QuickPanelShortcut(rawValue: raw) { shortcutPreset = preset }
+    }
+
+    private func configureQuickAccess() {
+        globalHotkey.onActivate = { [weak self] in self?.showQuickPanel() }
+        if shortcutEnabled { globalHotkey.register(shortcutPreset) }
+    }
+
+    private func setMenuBarMode(_ mode: MenuBarPresentation) {
+        guard menuBarMode != mode else { return }
+        menuBarMode = mode
+        UserDefaults.standard.set(mode.rawValue, forKey: menuBarModeKey)
+        lastDisplayKey = nil
+        renderUI()
+    }
+
+    private func setShortcut(enabled: Bool, preset: QuickPanelShortcut) {
+        shortcutEnabled = enabled
+        shortcutPreset = preset
+        UserDefaults.standard.set(enabled, forKey: shortcutEnabledKey)
+        UserDefaults.standard.set(preset.rawValue, forKey: shortcutPresetKey)
+        globalHotkey.unregister()
+        if enabled { globalHotkey.register(preset) }
+        renderUI()
+    }
+
+    private func configureQuickPanelControls() {
+        quickPanel.configure(mode: menuBarMode, shortcut: shortcutPreset,
+            shortcutEnabled: shortcutEnabled, shortcutError: globalHotkey.errorMessage,
+            onMode: { [weak self] mode in self?.setMenuBarMode(mode) },
+            onShortcut: { [weak self] enabled, key in
+                self?.setShortcut(enabled: enabled, preset: key)
+            })
+    }
+
+    @objc private func showQuickPanel() {
+        configureQuickPanelControls()
+        quickPanel.present(catalog: catalog.filter { AIProviderRegistry.isImplemented($0.id) },
+                           snapshots: displaySnapshots,
+                           failures: providerHealth.states.mapValues { $0.lastFailure },
+                           onRefresh: { [weak self] in self?.refresh(force: true) },
+                           onGuide: { [weak self] in self?.showMenuBarHelp() })
+    }
+
+    private func showMenuBarHelp() {
+        let alert = NSAlert()
+        alert.messageText = "メニューバーにAI Checkerが表示されない場合"
+        alert.informativeText = "メニューバーに空きがないと、macOSがアイコンを表示できないことがあります。\n\n" +
+            "1. AI Checkerの表示設定で『アイコンのみ』または『省スペース』を選択します。\n" +
+            "2. システム設定 → メニューバー（macOSのバージョンによって項目名が異なります）で不要な標準アイコンを整理します。\n" +
+            "3. 他社アプリは各アプリの設定でメニューバー表示をOFFにします。\n" +
+            "4. AI Checkerが隠れていても、設定したショートカットで利用状況パネルを開けます。\n\n" +
+            "AI Checkerは他アプリのアイコンを移動・非表示にしたり、アクセシビリティ権限を要求したりしません。"
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
+
+    private func addQuickAccessMenu(to parent: NSMenu) {
+        let item = NSMenuItem(title: "省スペース・ショートカット", action: nil, keyEquivalent: "")
+        MenuVisualStyle.adorn(item, symbol: "rectangle.compress.vertical")
+        let menu = NSMenu(title: "省スペース・ショートカット")
+        menu.autoenablesItems = false
+        addChoiceMenu("メニューバーの表示", options: [
+            ("通常", MenuBarPresentation.standard),
+            ("省スペース（数字のみ）", .compact),
+            ("アイコンのみ", .iconOnly)
+        ], to: menu,
+           selected: { [weak self] in self?.menuBarMode ?? .standard }) { [weak self] choice in
+            self?.setMenuBarMode(choice)
+        }
+        menu.addItem(.separator())
+        addStayOpenRow("ショートカットで開く", to: menu,
+            checked: { [weak self] in self?.shortcutEnabled ?? false }) { [weak self] in
+            guard let self else { return }
+            self.setShortcut(enabled: !self.shortcutEnabled, preset: self.shortcutPreset)
+        }
+        addChoiceMenu("ショートカットのキー", options: [
+            ("⌃⌥⌘ A", QuickPanelShortcut.defaultShortcut),
+            ("⌃⌥⌘ U", .alternativeShortcut)
+        ], to: menu,
+           selected: { [weak self] in self?.shortcutPreset ?? .defaultShortcut }) { [weak self] preset in
+            self?.setShortcut(enabled: self?.shortcutEnabled ?? true, preset: preset)
+        }
+        if let error = globalHotkey.errorMessage, shortcutEnabled {
+            let hint = NSMenuItem(title: "割り当てに失敗: " + error, action: nil, keyEquivalent: "")
+            menu.addItem(hint)
+        }
+        addStayOpenRow("利用状況パネルを開く", to: menu,
+                       symbolName: "rectangle.on.rectangle") { [weak self] in
+            self?.showQuickPanel()
+        }
+        addStayOpenRow("メニューバーの整理方法…", to: menu,
+                       symbolName: "questionmark.circle") { [weak self] in
+            DispatchQueue.main.async { [weak self] in self?.showMenuBarHelp() }
+        }
+        item.submenu = menu
+        parent.addItem(item)
     }
 
     /// Do NOT infer paid eligibility from an old PAT or from HTTP status codes.
@@ -354,13 +516,23 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             visibleProviders: preferences.visibleProviders(in: catalog),
             stale: isStale, demo: demo)
         if currentKey != lastDisplayKey {
-            guard let image = StatusArtwork.render(presented, stale: isStale, demo: demo,
-                                                   preferences: preferences, catalog: catalog,
-                                                   monthlyCopilotUsage: currentCopilotBarUsage) else {
-                item.isVisible = false
-                lastDisplayKey = currentKey
-                return
-            }
+            let imagePreferences: AICheckerSettings = {
+                var settings = preferences
+                if menuBarMode == .compact {
+                    settings.nameStyle = .icon
+                    settings.metricStyle = .percentOnly
+                    settings.providerGap = 0
+                }
+                return settings
+            }()
+            let image = (menuBarMode == .iconOnly
+                ? StatusArtwork.renderLauncherIcon()
+                : StatusArtwork.render(presented, stale: isStale, demo: demo,
+                                       preferences: imagePreferences, catalog: catalog,
+                                       monthlyCopilotUsage: currentCopilotBarUsage,
+                                       monthlyAPIReports: currentAPIMenuBarLabels))
+                ?? StatusArtwork.renderLauncherIcon()
+            guard let image else { return }
             item.isVisible = true
             // A variable-length status item follows NSStatusBarButton's
             // content width without an explicit item.length write. This is
@@ -372,6 +544,12 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             item.button?.needsDisplay = true
             item.button?.displayIfNeeded()
             lastDisplayKey = currentKey
+        }
+        if quickPanel.isVisible {
+            configureQuickPanelControls()
+            quickPanel.refresh(catalog: catalog.filter { AIProviderRegistry.isImplemented($0.id) },
+                               snapshots: presented,
+                               failures: providerHealth.states.mapValues { $0.lastFailure })
         }
         if menuIsTracking {
             // Keep the *existing* native root + open submenu alive during
@@ -386,7 +564,11 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         liveMenuRows.removeAll()
         let menu = NSMenu(title: "AI Checker")
         menu.autoenablesItems = false
-        menu.addItem(MenuVisualStyle.heading(demo ? "AI CHECKER  /  DEMO" : "AI CHECKER  /  USAGE"))
+        let speedHeader = UsageSpeedHeaderView()
+        self.speedHeader = speedHeader
+        let heading = NSMenuItem(title: "AI CHECKER / USAGE", action: nil, keyEquivalent: "")
+        heading.view = speedHeader
+        menu.addItem(heading)
         menu.addItem(.separator())
         // Every provider uses the full width. The detailed reset times and source
         // now branch into native menus rather than taking five grey rows each.
@@ -475,6 +657,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         menu.addItem(.separator())
         menu.addItem(MenuVisualStyle.heading("APPEARANCE  /  設定"))
         addDisplaySettingsMenu(to: menu)
+        addQuickAccessMenu(to: menu)
         addQuotaNotificationMenu(to: menu)
         menu.addItem(.separator())
         addStayOpenRow("ログイン時に自動起動", to: menu,
@@ -516,9 +699,23 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     // MARK: - Native branching menus that stay open on in-place changes
 
-    func menuWillOpen(_ menu: NSMenu) { menuIsTracking = true }
+    func menuWillOpen(_ menu: NSMenu) {
+        menuIsTracking = true
+        startMenuNetworkSpeed()
+    }
+
+    private func startMenuNetworkSpeed() {
+        guard menuIsTracking, !sleeping else { return }
+        speedHeader?.begin()
+        networkSpeed.start { [weak self] outcome in
+            guard let self, self.menuIsTracking, !self.sleeping else { return }
+            self.speedHeader?.show(outcome)
+        }
+    }
 
     func menuDidClose(_ menu: NSMenu) {
+        networkSpeed.stop()
+        speedHeader?.end()
         menuIsTracking = false
         // Avoid mutating a menu inside AppKit's tracking/close callback.
         if pendingMenuRefresh {
@@ -559,11 +756,9 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
     private func updateDisplaySetting(_ change: (inout AICheckerSettings) -> Void) {
         var updated = preferences
         change(&updated)
-        guard updated.visibleProviderIDs.contains("codex") ||
-              updated.visibleProviderIDs.contains("claude") else {
-            NSSound.beep()
-            return
-        }
+        // An icon-only launcher remains available even when neither quota meter
+        // is selected; never make the application impossible to reopen.
+
         preferences = updated
         savePreferences()   // menu remains tracked; only status artwork changes
     }
@@ -1341,6 +1536,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
                 guard let self = self, !self.sleeping,
                       self.externalClients[kind]?.configured == true else { return }
                 self.externalReports[kind] = report
+                self.lastDisplayKey = nil // official API report may be visible in the status bar
                 self.providerHealth.succeed(kind.rawValue, now: Date())
                 self.lastSuccess = Date()
                 self.renderUI()
@@ -1379,6 +1575,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         if client.configure(secret: token.stringValue, teamID: team?.stringValue) {
             externalReports.removeValue(forKey: kind)
+            lastDisplayKey = nil
             providerHealth.reset(kind.rawValue)
             if providerHealth.begin(kind.rawValue, now: Date(), forced: true) {
                 client.requestUsage(force: true)
@@ -1412,6 +1609,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         client.disconnect()
         externalReports.removeValue(forKey: kind)
+        lastDisplayKey = nil
         providerHealth.reset(kind.rawValue)
         renderUI()
     }
@@ -1510,8 +1708,15 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             guard let self else { return }
             self.quotaNotifier.requestPermission { [weak self] permitted in
                 guard let self else { return }
-                if permitted { self.quotaNotifier.sendTestNotification() }
-                else {
+                if permitted {
+                    self.quotaNotifier.sendTestNotification { [weak self] error in
+                        guard self != nil, let error else { return }
+                        let alert = NSAlert()
+                        alert.messageText = "テスト通知の送信に失敗しました"
+                        alert.informativeText = error.localizedDescription
+                        alert.runModal()
+                    }
+                } else {
                     let alert = NSAlert()
                     alert.messageText = "通知が許可されていません"
                     alert.informativeText = "システム設定 → 通知 → AI Checker を確認してください。"
@@ -1519,7 +1724,95 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
                 }
             }
         }
+        menu.addItem(.separator())
+        addStayOpenRow("通知状態を確認…", to: menu, symbolName: "checkmark.shield") { [weak self] in
+            guard let self else { return }
+            self.quotaNotifier.describeSystemSettings { [weak self] systemStatus in
+                guard let self else { return }
+                let reset = self.quotaNotificationSettings.notifyOnReset ? "ON" : "OFF"
+                let exhaustion = self.quotaNotificationSettings.notifyOnExhaustion ? "ON" : "OFF"
+                let alert = NSAlert()
+                alert.messageText = "AI Checkerの通知診断"
+                alert.informativeText = "リセット通知: \(reset)\n使い切り通知: \(exhaustion)\n\n\(systemStatus)\n\n実際の通知は新しい残量データによる状態変化時のみ発火します。最初から0%の場合や更新失敗時は通知しません。"
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
+            }
+        }
         item.submenu = menu
+        parent.addItem(item)
+    }
+
+    // MARK: - Independent menu-bar provider choices
+
+    private func loadAPIMenuBarSelection() {
+        let valid = Set(ExternalAPIKind.allCases.map(\.rawValue))
+        let stored = UserDefaults.standard.stringArray(forKey: apiMenuBarSelectionKey) ?? []
+        selectedAPIMenuBarIDs = Set(stored.filter { valid.contains($0) })
+    }
+
+    private func toggleAPIMenuBar(_ kind: ExternalAPIKind) {
+        guard externalClients[kind]?.configured == true else { return }
+        if selectedAPIMenuBarIDs.contains(kind.rawValue) {
+            selectedAPIMenuBarIDs.remove(kind.rawValue)
+        } else {
+            selectedAPIMenuBarIDs.insert(kind.rawValue)
+        }
+        UserDefaults.standard.set(selectedAPIMenuBarIDs.sorted(), forKey: apiMenuBarSelectionKey)
+        lastDisplayKey = nil
+        renderUI()
+    }
+
+    private var currentAPIMenuBarLabels: [String] {
+        let now = Date()
+        let thisMonth = ExternalAPIUsage.startOfUTCMonth(now)
+        return ExternalAPIKind.allCases.compactMap { kind in
+            guard selectedAPIMenuBarIDs.contains(kind.rawValue),
+                  externalClients[kind]?.configured == true else { return nil }
+            let prefix: String
+            switch kind {
+            case .openaiAPI: prefix = "OA"
+            case .cursorTeam: prefix = "CT"
+            case .xaiAPI: prefix = "xAI"
+            }
+            guard let report = externalReports[kind], report.periodStart == thisMonth,
+                  report.observedAt <= now.addingTimeInterval(60),
+                  now.timeIntervalSince(report.observedAt) <= 3600,
+                  report.value.isFinite, report.value >= 0 else { return prefix + " —" }
+            switch kind {
+            case .cursorTeam: return prefix + " " + String(format: "%.0f req", report.value)
+            case .openaiAPI, .xaiAPI: return prefix + " " + String(format: "$%.2f", report.value)
+            }
+        }
+    }
+
+    private func addMenuBarProviderSelectionMenu(to parent: NSMenu) {
+        let item = NSMenuItem(title: "メニューバーに表示するAI", action: nil, keyEquivalent: "")
+        let submenu = NSMenu(title: item.title)
+        submenu.autoenablesItems = false
+        for (id, name) in [("codex", "Codex（5h / Week）"), ("claude", "Claude（5h / Week）")] {
+            addStayOpenRow(name, to: submenu,
+                checked: { [weak self] in self?.preferences.visibleProviderIDs.contains(id) ?? false }) { [weak self] in
+                self?.updateDisplaySetting { settings in
+                    settings.setVisible(id, !settings.visibleProviderIDs.contains(id))
+                }
+            }
+        }
+        submenu.addItem(.separator())
+        addStayOpenRow("GitHub Copilot（当月リクエスト）", to: submenu,
+            checked: { [weak self] in
+                self.map { UserDefaults.standard.bool(forKey: $0.copilotMenuBarKey) } ?? false
+            }, enabledWhen: { [weak self] in
+                guard let self else { return false }
+                return self.copilotAccessMode.permitsPersonalBillingAPI && self.copilotClient.configured
+            }) { [weak self] in self?.toggleCopilotBar() }
+        for kind in ExternalAPIKind.allCases {
+            addStayOpenRow(kind.name + "（当月API使用量）", to: submenu,
+                checked: { [weak self] in self?.selectedAPIMenuBarIDs.contains(kind.rawValue) ?? false },
+                enabledWhen: { [weak self] in self?.externalClients[kind]?.configured ?? false }) { [weak self] in
+                self?.toggleAPIMenuBar(kind)
+            }
+        }
+        item.submenu = submenu
         parent.addItem(item)
     }
 
@@ -1528,14 +1821,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         MenuVisualStyle.adorn(item, symbol: "paintbrush.pointed")
         let menu = NSMenu(title: "表示設定")
         menu.autoenablesItems = false
-        for (id, title) in [("codex", "Codex を表示"), ("claude", "Claude を表示")] {
-            addStayOpenRow(title, to: menu,
-                checked: { [weak self] in self?.preferences.visibleProviderIDs.contains(id) ?? false }) { [weak self] in
-                self?.updateDisplaySetting { settings in
-                    settings.setVisible(id, !settings.visibleProviderIDs.contains(id))
-                }
-            }
-        }
+        addMenuBarProviderSelectionMenu(to: menu)
         menu.addItem(.separator())
         addChoiceMenu("名前表示", options: [("フルネーム", NameStyle.full),
                                         ("短縮名", .short), ("各AIのアイコン", .icon)],
@@ -1594,7 +1880,13 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         SMAppService.openSystemSettingsLoginItems()
     }
 
-    @objc private func resetSettings() { preferences = AICheckerSettings(); savePreferences() }
+    @objc private func resetSettings() {
+        selectedAPIMenuBarIDs.removeAll()
+        UserDefaults.standard.removeObject(forKey: apiMenuBarSelectionKey)
+        UserDefaults.standard.set(false, forKey: copilotMenuBarKey)
+        preferences = AICheckerSettings()
+        savePreferences()
+    }
     @objc private func refreshNow() { refresh(force: true) }
     @objc private func quit() { NSApp.terminate(nil) }
 
@@ -1651,7 +1943,31 @@ if CommandLine.arguments.contains("--ingest-claude-statusline") {
         fputs("FAIL: status item geometry does not follow visible content\n", stderr)
         exit(1)
     }
+    var reportOnly = numeric
+    reportOnly.visibleProviderIDs = []
+    guard let apiOnlyImage = StatusArtwork.render([:], stale: false, demo: false,
+        preferences: reportOnly, catalog: catalog, monthlyAPIReports: ["OA $1.23"]),
+          apiOnlyImage.size.width > 40 else {
+        fputs("FAIL: API-only status item must remain visible without invented quotas\n", stderr)
+        exit(1)
+    }
+    print("PASS: API-only status item shows actual monthly usage without quota bars")
     print("PASS: AppKit status geometry numeric < bars < combined; compact < wide; one < two")
+ } else if CommandLine.arguments.contains("--selftest-quick-access-layout") {
+    // No accessibility access, credentials, hotkey installation or windows required.
+    guard let icon = StatusArtwork.renderLauncherIcon(), icon.size.width >= 20,
+          icon.size.width <= 30, icon.size.height == StatusArtwork.height else {
+        fputs("FAIL: compact launcher artwork dimensions\n", stderr)
+        exit(1)
+    }
+    let core = AICheckerSettings()
+    var compact = core
+    compact.nameStyle = .icon
+    compact.metricStyle = .percentOnly
+    compact.providerGap = 0
+    let width = StatusArtwork.layout(for: compact, catalog: AIProviderRegistry.catalog).width
+    guard width > 23 else { fputs("FAIL: compact mode width\n", stderr); exit(1) }
+    print("PASS: independent 23pt launcher icon and compact layout available")
 } else if CommandLine.arguments.contains("--selftest-claude-profile") {
     // Local, offline contract test. Writes only a fresh UUID-scoped directory
     // and removes it afterwards; never touches ~/.claude or credentials.

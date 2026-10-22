@@ -1,6 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# SwiftPM treats unknown files under Sources as unhandled resources.
+python3 - <<'PYSOURCE'
+from pathlib import Path
+junk = [p.as_posix() for p in Path('Sources').rglob('*')
+        if p.is_file() and p.suffix.lower() in {'.orig', '.bak', '.swp', '.tmp'}]
+assert not junk, f'Unexpected editor backup files in SwiftPM source tree: {junk}'
+source = Path('Sources/AIChecker/GlobalUsageHotkey.swift').read_text()
+assert 'MemoryLayout<EventHotKeyID>.size, nil, &received)' in source
+assert 'UInt32(MemoryLayout<EventHotKeyID>.size)' not in source
+print('PASS: Carbon GetEventParameter size type and source hygiene')
+PYSOURCE
 for file in scripts/*.sh; do bash -n "$file"; done
 python3 - <<'PY'
 from pathlib import Path
@@ -54,18 +65,26 @@ assert 'Claude専用ブラウザでログイン…' not in m
 print('PASS: public Claude Web network access disabled; CLI statusLine retained')
 PYVALIDATE
 python3 Tests/test_public_release.py
+python3 Tests/test_distribution_release.py
 python3 Tests/test_release_invariants.py
 python3 Tests/test_consumer_web_integration.py
 python3 Tests/test_quota_notifications_integration.py
 python3 Tests/test_live_settings_preview.py
+python3 Tests/test_menu_bar_fallback.py
+python3 Tests/test_spotlight_reopen.py
+python3 Tests/test_network_speed_and_spotlight.py
+python3 Tests/test_notification_diagnostics.py
+python3 Tests/test_menu_bar_provider_selection.py
 python3 Tests/test_installer_offline.py
+python3 Tests/test_app_discovery_and_icon.py
 # Parsing verifies syntax on Linux; native AppKit/WebKit type-check requires macOS.
 swiftc -frontend -parse Sources/AIChecker/*.swift
 swift test --jobs 2
-./scripts/test-codex-bridge.sh
+bash scripts/test-codex-bridge.sh
 if [[ "$(uname -s)" == Darwin ]]; then
     swift build --jobs 2 -c release
     "$(swift build -c release --show-bin-path)/AIChecker" --selftest-claude-profile
     "$(swift build -c release --show-bin-path)/AIChecker" --selftest-status-layout
-    ./scripts/test-claude-telemetry.sh
+    "$(swift build -c release --show-bin-path)/AIChecker" --selftest-quick-access-layout
+    bash scripts/test-claude-telemetry.sh
 fi

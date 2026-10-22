@@ -48,10 +48,17 @@ class OfflineInstallFlowTests(unittest.TestCase):
         env['HOME'] = str(home)
         env['PATH'] = f'{mockbin}:{os.environ.get("PATH", "")}'
         env['INSTALL_TEST_OPEN_LOG'] = str(home / 'opened.txt')
+        # Keep every path in the test's TemporaryDirectory. Never inspect
+        # or mutate the host Mac's /Applications directory.
+        env['AI_CHECKER_INSTALL_TESTING'] = '1'
+        env['AI_CHECKER_TEST_SYSTEM_APPLICATIONS_DIR'] = str(home / 'fake-system-Applications')
+        (home / 'fake-system-Applications').mkdir()
+        write_sh(mockbin / 'sudo', 'exec "$@"')
         return env
 
-    def run_install(self, home, env, old_exists=True):
-        dest = home / 'Applications' / 'AI Checker.app'
+    def run_install(self, home, env, old_exists=True, system=False):
+        dest = (home / 'fake-system-Applications' / 'AI Checker.app'
+                if system else home / 'Applications' / 'AI Checker.app')
         if old_exists:
             (dest / 'Contents' / 'MacOS').mkdir(parents=True)
             (dest / 'Contents' / 'MacOS' / 'AIChecker').write_text('OLD-BINARY')
@@ -70,7 +77,7 @@ class OfflineInstallFlowTests(unittest.TestCase):
             backup = home / 'Applications' / 'AI Checker.previous.app'
             self.assertEqual((backup / 'Contents' / 'MacOS' / 'AIChecker').read_text(), 'OLD-BINARY')
             self.assertIn('AI Checker.app', (home / 'opened.txt').read_text())
-            self.assertIn('1.9.2', (dest / 'Contents' / 'Info.plist').read_text())
+            self.assertIn('1.10.1', (dest / 'Contents' / 'Info.plist').read_text())
 
     def test_build_failure_never_stops_or_overwrites_existing_app(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -90,6 +97,42 @@ class OfflineInstallFlowTests(unittest.TestCase):
             self.assertIn('different signing identity', result.stderr)
             self.assertEqual((dest / 'Contents' / 'MacOS' / 'AIChecker').read_text(), 'OLD-BINARY')
             self.assertFalse((home / 'opened.txt').exists())
+
+    def test_system_install_after_spotlight_migration_updates_in_place(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = pathlib.Path(tmp)
+            env = self.make_env(home)
+            result, dest = self.run_install(home, env, system=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            backup = home / 'fake-system-Applications' / 'AI Checker.previous.app'
+            self.assertEqual((backup / 'Contents' / 'MacOS' / 'AIChecker').read_text(), 'OLD-BINARY')
+            self.assertTrue((dest / 'Contents' / 'MacOS' / 'AIChecker').is_file())
+            self.assertFalse((home / 'Applications' / 'AI Checker.app').exists())
+            self.assertIn(str(dest), (home / 'opened.txt').read_text())
+
+    def test_dual_installs_fail_safely_without_replacement(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = pathlib.Path(tmp)
+            env = self.make_env(home)
+            system_app = home / 'fake-system-Applications' / 'AI Checker.app'
+            (system_app / 'Contents' / 'MacOS').mkdir(parents=True)
+            (system_app / 'Contents' / 'MacOS' / 'AIChecker').write_text('SYSTEM-ORIGINAL')
+            result, user_app = self.run_install(home, env)
+            self.assertEqual(result.returncode, 3)
+            self.assertIn('Both system and user AI Checker bundles exist', result.stderr)
+            self.assertEqual((user_app / 'Contents' / 'MacOS' / 'AIChecker').read_text(), 'OLD-BINARY')
+            self.assertEqual((system_app / 'Contents' / 'MacOS' / 'AIChecker').read_text(), 'SYSTEM-ORIGINAL')
+            self.assertFalse((home / 'opened.txt').exists())
+
+    def test_test_mode_rejects_missing_synthetic_root(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = pathlib.Path(tmp)
+            env = self.make_env(home)
+            del env['AI_CHECKER_TEST_SYSTEM_APPLICATIONS_DIR']
+            result, dest = self.run_install(home, env)
+            self.assertEqual(result.returncode, 3)
+            self.assertIn('fixture missing synthetic Applications directory', result.stderr)
+            self.assertEqual((dest / 'Contents' / 'MacOS' / 'AIChecker').read_text(), 'OLD-BINARY')
 
 
 if __name__ == '__main__':

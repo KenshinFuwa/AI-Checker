@@ -32,7 +32,7 @@ Both values above are **placeholders**; do not copy them without substituting yo
 
 - [ ] Apple notary status **Accepted**, `stapler validate` PASS and signing chain/Team ID verified.
 - [ ] Install the DMG on a second/clean Mac and verify Gatekeeper, Spotlight search, app icon, Accessibility-free shortcut and all notification permissions.
-- [ ] Confirm `lipo -verify_arch arm64 x86_64` PASS on the signed executable inside the DMG; then test on real Apple Silicon and Intel Macs. The CI universal preflight only checks compilation, not hardware execution.
+- [ ] Confirm `lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64` PASS on the signed executable inside the DMG; then test on real Apple Silicon and Intel Macs. The CI universal preflight only checks compilation, not hardware execution.
 - [ ] Review privacy and account connection behavior; no test keys or private Web session access in the public build.
 - [ ] **Upgrade/migration**: prior locally signed apps may have a different designated requirement; their login item and Keychain storage might require explicit migration. Do not overwrite them silently or claim seamless upgrades.
 - [ ] Verify security vulnerability reporting, README download instructions, checksums and release notes before a GitHub Release.

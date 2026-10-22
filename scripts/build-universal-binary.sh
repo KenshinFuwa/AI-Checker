@@ -22,12 +22,12 @@ for ARCH in arm64 x86_64; do
     BIN_DIR="$(swift build --jobs 2 -c release --arch "$ARCH" --scratch-path "$BUILD" --show-bin-path)"
     BIN="$BIN_DIR/AIChecker"
     [[ -s "$BIN" && -x "$BIN" ]] || { echo "ERROR: missing $ARCH release executable." >&2; exit 3; }
-    lipo -verify_arch "$ARCH" "$BIN" || { echo "ERROR: incorrect $ARCH executable architecture." >&2; exit 3; }
+    lipo "$BIN" -verify_arch "$ARCH" || { echo "ERROR: incorrect $ARCH executable architecture." >&2; exit 3; }
     cp "$BIN" "$TEMP/AIChecker-$ARCH"
 done
 # Signing must happen only AFTER combining Mach-O slices.
 lipo -create -output "$TEMP/AIChecker" "$TEMP/AIChecker-arm64" "$TEMP/AIChecker-x86_64"
-lipo -verify_arch arm64 x86_64 "$TEMP/AIChecker" || { echo 'ERROR: Universal 2 verification failed.' >&2; exit 3; }
+lipo "$TEMP/AIChecker" -verify_arch arm64 x86_64 || { echo 'ERROR: Universal 2 verification failed.' >&2; exit 3; }
 file "$TEMP/AIChecker"
 chmod 755 "$TEMP/AIChecker"
 # One atomic rename, after both architectures have independently succeeded.

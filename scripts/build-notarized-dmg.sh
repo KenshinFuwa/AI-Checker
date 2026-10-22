@@ -29,7 +29,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 # Build both slices in isolation and combine BEFORE Developer ID signing.
 bash scripts/build-universal-binary.sh "$TEMP/AIChecker-universal"
 cp "$TEMP/AIChecker-universal" "$APP/Contents/MacOS/AIChecker"
-lipo -verify_arch arm64 x86_64 "$APP/Contents/MacOS/AIChecker"
+lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64
 chmod 755 "$APP/Contents/MacOS/AIChecker"
 cp scripts/release/Info.plist "$APP/Contents/Info.plist"
 cp Design/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
@@ -39,7 +39,7 @@ sips -g pixelWidth -g pixelHeight "$APP/Contents/Resources/AppIcon.icns" >/dev/n
 # --options runtime and a timestamp are required for notarizable Developer ID output.
 codesign --force --sign "$IDENTITY" --options runtime --timestamp "$APP"
 codesign --verify --strict --verbose=2 "$APP"
-lipo -verify_arch arm64 x86_64 "$APP/Contents/MacOS/AIChecker"
+lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64
 codesign -dv --verbose=4 "$APP" 2> "$TEMP/signing.txt"
 grep -F 'Authority=Developer ID Application:' "$TEMP/signing.txt" >/dev/null || {
     echo 'ERROR: signed app is not identified by Developer ID Application.' >&2; exit 3;

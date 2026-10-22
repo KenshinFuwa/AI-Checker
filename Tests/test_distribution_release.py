@@ -14,7 +14,7 @@ class ReleaseContracts(unittest.TestCase):
     def test_no_release_without_notorization(self):
         s=(ROOT/'scripts/build-notarized-dmg.sh').read_text()
         for key in ['Developer ID Application:', '--options runtime', '--timestamp',
-                    'notarytool submit', "status != 'Accepted'",'stapler staple','stapler validate','hdiutil verify', 'build-universal-binary.sh', 'lipo -verify_arch arm64 x86_64']:
+                    'notarytool submit', "status != 'Accepted'",'stapler staple','stapler validate','hdiutil verify', 'build-universal-binary.sh', 'lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64']:
             self.assertIn(key,s)
         self.assertLess(s.index("status != 'Accepted'"),s.index('mkdir -p "$ROOT/dist"'))
         self.assertNotIn('gh release create',s)
@@ -30,13 +30,14 @@ class ReleaseContracts(unittest.TestCase):
         for marker in ['universal-macos:', 'macos-latest', 'scripts/check-universal-build.sh']:
             self.assertIn(marker, wf)
         for marker in ['--arch "$ARCH"', 'for ARCH in arm64 x86_64', 'lipo -create',
-                       'lipo -verify_arch arm64 x86_64', 'NOT signed, NOT notarized']:
+                       'lipo "$TEMP/AIChecker" -verify_arch arm64 x86_64', 'NOT signed, NOT notarized']:
             self.assertIn(marker, build)
         self.assertIn('trap cleanup EXIT', build)
         self.assertIn('trap cleanup EXIT', wrapper)
         self.assertIn('bash scripts/build-universal-binary.sh', wrapper)
         self.assertNotIn('gh release', build)
         self.assertNotIn('gh release', wrapper)
+        self.assertNotIn('lipo -verify_arch', build)
         self.assertNotIn('codesign --sign', build)
         self.assertNotIn('/Applications/AI Checker.app', build)
     def test_public_bundle_does_not_contain_provider_images(self):

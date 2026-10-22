@@ -7,5 +7,5 @@ TEMP="$(mktemp -d "${TMPDIR:-/tmp/}aichecker-universal-gate.XXXXXXXX")"
 cleanup() { rm -rf "$TEMP"; }
 trap cleanup EXIT
 bash scripts/build-universal-binary.sh "$TEMP/AIChecker"
-lipo -verify_arch arm64 x86_64 "$TEMP/AIChecker"
+lipo "$TEMP/AIChecker" -verify_arch arm64 x86_64
 echo 'PASS: macOS arm64 + x86_64 slices. Artifact removed on exit; no app installation or release.'

@@ -1,8 +1,8 @@
-# Installing the source-only beta / インストール
+# Installing the source-only beta
 
-## Quick connection to Codex / Codexの簡単接続
+## Quick connection to Codex
 
-After launching AI Checker, choose **ACCOUNTS → ChatGPTでかんたん接続…**.
+After launching AI Checker, open **ACCOUNTS** and select the **ChatGPT quick-connect** action. The in-app menu label may be localized.
 If the official Codex CLI is installed in a recognized location, AI Checker
 creates or reuses its **isolated Codex profile**, opens the browser-based
 ChatGPT login supplied by the official Codex App Server, and reads the
@@ -15,14 +15,6 @@ or the option to select an already installed CLI executable. **Installing
 the CLI may still be required**; AI Checker does not silently download or
 execute installer scripts, alter the default ~/.codex, or promise that
 ordinary ChatGPT chat quotas can be read.
-
-起動後、**「接続 → ChatGPTでかんたん接続…」**を選んでください。
-公式Codex CLIが見つかれば、AI Checker専用プロフィールを自動作成または
-再利用して、OpenAI公式のブラウザ認証を開始します。
-CLIがない場合は公式導入ページか既存の実行ファイル指定に案内します。
-**CLIのインストール自体は必要になる場合があります。**
-AI Checkerが勝手にインストーラを実行したり、通常の ~/.codex を
-読み書きしたりすることはありません。
 
 ## A. Developer build without touching an existing installation (recommended first)
 

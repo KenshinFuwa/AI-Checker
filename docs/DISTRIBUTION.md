@@ -30,10 +30,10 @@ Both values above are **placeholders**; do not copy them without substituting yo
 
 ## 4. Mandatory release gates
 
-- [ ] Audit both macOS CI jobs and disposable unsigned DMG mount/layout; this is **not** notarization proof.
+- [x] Audit all four PR #7 CI jobs (Linux, native macOS, Universal 2/DMG, Intel x86_64 packaged AppKit bootstrap); run `39977688759` passed. This is **not** notarization or clean-install proof.
 - [ ] Apple notary status **Accepted**, `stapler validate` PASS and signing chain/Team ID verified.
 - [ ] Install the DMG on a second/clean Mac and verify Gatekeeper, Spotlight search, app icon, Accessibility-free shortcut and all notification permissions.
-- [ ] Confirm `lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64` PASS on the signed executable inside the DMG; then test on real Apple Silicon and Intel Macs. The CI universal preflight only checks compilation, not hardware execution.
+- [ ] Confirm `lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64` PASS on the signed executable inside the DMG; then test on real Apple Silicon and Intel Macs. The separate Intel macOS CI job confirms an isolated packaged AppKit bootstrap on an x86_64 VM. Neither this VM smoke test nor `lipo` proves normal installation and use on a physical Intel Mac.
 - [ ] Review privacy and account connection behavior; no test keys or private Web session access in the public build.
 - [ ] **Upgrade/migration**: prior locally signed apps may have a different designated requirement; their login item and Keychain storage might require explicit migration. Do not overwrite them silently or claim seamless upgrades.
 - [ ] Verify security vulnerability reporting, README download instructions, checksums and release notes before a GitHub Release.

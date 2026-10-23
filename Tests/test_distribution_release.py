@@ -9,6 +9,8 @@ class ReleaseContracts(unittest.TestCase):
         self.assertEqual(info['CFBundleExecutable'],'AIChecker')
         self.assertEqual(info['CFBundleShortVersionString'],'1.10.1')
         self.assertEqual(info['CFBundleIconFile'],'AppIcon.icns')
+        self.assertEqual(info['CFBundleDevelopmentRegion'],'en')
+        self.assertEqual(info['CFBundleLocalizations'],['en','ja'])
         self.assertTrue(info['LSUIElement'])
         self.assertIn('Kenshin Fuwa', info['NSHumanReadableCopyright'])
     def test_no_release_without_notorization(self):
@@ -46,6 +48,9 @@ class ReleaseContracts(unittest.TestCase):
         audit=(ROOT/'scripts/audit-release-dmg.sh').read_text()
         pre=(ROOT/'scripts/check-universal-build.sh').read_text()
         release=(ROOT/'scripts/build-notarized-dmg.sh').read_text()
+        for language in ('en', 'ja'):
+            self.assertIn(f'Localization/$LANGUAGE.lproj/Localizable.strings', stage)
+            self.assertIn('Localization/$LANGUAGE.lproj/Localizable.strings', audit)
         self.assertIn('bash scripts/stage-release-app.sh', pre)
         self.assertIn('bash scripts/stage-release-app.sh', release)
         self.assertIn('bash scripts/audit-release-dmg.sh --unsigned-preflight', pre)

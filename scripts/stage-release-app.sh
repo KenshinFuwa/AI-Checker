@@ -24,6 +24,18 @@ cp "$BIN" "$APP/Contents/MacOS/AIChecker"
 chmod 755 "$APP/Contents/MacOS/AIChecker"
 cp "$ROOT/scripts/release/Info.plist" "$APP/Contents/Info.plist"
 cp "$ROOT/Design/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
+# Localizations must be in the signed app bundle; a raw SwiftPM executable
+# does not establish macOS bundle language negotiation.
+for LANGUAGE in en ja; do
+    RESOURCE="$ROOT/Localization/$LANGUAGE.lproj/Localizable.strings"
+    [[ -s "$RESOURCE" && ! -L "$RESOURCE" ]] || {
+        echo "ERROR: missing $LANGUAGE localization." >&2; exit 3;
+    }
+    plutil -lint "$RESOURCE" >/dev/null
+    mkdir -p "$APP/Contents/Resources/$LANGUAGE.lproj"
+    cp "$RESOURCE" "$APP/Contents/Resources/$LANGUAGE.lproj/Localizable.strings"
+    cmp "$RESOURCE" "$APP/Contents/Resources/$LANGUAGE.lproj/Localizable.strings"
+done
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 plutil -lint "$APP/Contents/Info.plist"
 sips -g pixelWidth -g pixelHeight "$APP/Contents/Resources/AppIcon.icns" >/dev/null

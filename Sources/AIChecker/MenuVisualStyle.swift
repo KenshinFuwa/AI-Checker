@@ -4,9 +4,10 @@ import AppKit
 /// polling, timers or third-party UI dependencies).
 enum MenuVisualStyle {
     static func heading(_ title: String) -> NSMenuItem {
-        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        let localizedTitle = AppL10n.text(title)
+        let item = NSMenuItem(title: localizedTitle, action: nil, keyEquivalent: "")
         item.isEnabled = false
-        item.attributedTitle = NSAttributedString(string: "  " + title.uppercased(), attributes: [
+        item.attributedTitle = NSAttributedString(string: "  " + localizedTitle.uppercased(), attributes: [
             .font: NSFont.systemFont(ofSize: 10, weight: .semibold),
             .foregroundColor: NSColor.secondaryLabelColor
         ])

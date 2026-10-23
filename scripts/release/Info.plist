@@ -6,6 +6,7 @@
 <key>CFBundleName</key><string>AI Checker</string>
 <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
 <key>CFBundleDevelopmentRegion</key><string>en</string>
+<key>CFBundleLocalizations</key><array><string>en</string><string>ja</string></array>
 <key>CFBundleIconFile</key><string>AppIcon.icns</string>
 <key>CFBundleDisplayName</key><string>AI Checker</string>
 <key>CFBundlePackageType</key><string>APPL</string>

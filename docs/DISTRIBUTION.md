@@ -55,3 +55,7 @@ python3 scripts/verify-release-checksum.py /absolute/path/AI-Checker-v1.10.1-not
 ```
 
 This uses Python's standard library and is safe on Linux, Windows or macOS. The validator refuses symlinked inputs, malformed checksum records, incorrect filenames and hash mismatches. **Neither a SHA-256 checksum nor success here establishes that the publisher is legitimate, that Apple notarized the DMG, or that Gatekeeper will permit the app.** Those are separate signing, notarization and clean-machine review gates. Do not offer a link to an unsigned CI artifact.
+
+## Intel native execution in CI (without Developer ID)
+
+The source validation workflow has an independent `macos-15-intel` job with an explicit `uname -m = x86_64` assertion. It builds the Universal 2 application on an Intel macOS virtual machine and runs the opt-in, no-account AppKit bootstrap **from inside an isolated, mounted, disposable DMG**. This is stronger than checking the Intel Mach-O slice with `lipo` on an Apple Silicon host. It does **not** establish a clean Intel user's Gatekeeper, login-item, notification, or account experience; those still require dedicated testing. The job never uploads unsigned binaries or installs an app.

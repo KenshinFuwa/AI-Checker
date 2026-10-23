@@ -64,6 +64,18 @@ class ReleaseContracts(unittest.TestCase):
             self.assertNotIn('killall ', s)
             self.assertNotIn('open /Applications', s)
 
+    def test_intel_runner_executes_native_appkit_smoke(self):
+        workflow=(ROOT/'.github/workflows/mac-validation.yml').read_text()
+        intel=workflow.split('  intel-native-bootstrap:',1)[1]
+        self.assertIn('runs-on: macos-15-intel',intel)
+        self.assertIn('test "$(uname -m)" = x86_64',intel)
+        self.assertIn('AI_CHECKER_CI_BOOTSTRAP=1 bash scripts/check-universal-build.sh',intel)
+        self.assertIn('python3 scripts/verify-source-manifest.py',intel)
+        self.assertNotIn('actions/upload-artifact',intel)
+        self.assertNotIn('gh release',intel)
+        self.assertNotIn('sudo ',intel)
+        self.assertNotIn('xattr -dr',intel)
+
     def test_public_bundle_does_not_contain_provider_images(self):
         self.assertFalse(list((ROOT/'Sources/AIChecker/Assets').glob('*.png')))
 if __name__=='__main__': unittest.main(verbosity=2)

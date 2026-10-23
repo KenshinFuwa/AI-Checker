@@ -1,3 +1,9 @@
+## v1.10.1 — Intel macOS runner executable smoke gate
+
+- Add a native `macos-15-intel` CI job that checks `uname -m = x86_64` and executes the app's packaged AppKit bootstrap from a mounted disposable Universal 2 DMG.
+- No installer, login item, account, notification, or Gatekeeper bypass; this is **not** an Intel user-installation test.
+- The standard macOS arm64, Linux and preview workflow remain unchanged.
+
 ## v1.10.1 — isolated packaged AppKit startup smoke
 
 - GitHub macOS CI now runs an opt-in AppKit bootstrap directly from a mounted temporary DMG.

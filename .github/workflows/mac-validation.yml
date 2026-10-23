@@ -47,3 +47,19 @@ jobs:
         run: AI_CHECKER_CI_BOOTSTRAP=1 bash scripts/check-universal-build.sh
       - name: Note distribution status
         run: echo 'This job produces no distributable app; Developer ID and notarization remain mandatory.'
+  intel-native-bootstrap:
+    name: Native Intel x86_64 AppKit bootstrap (macOS 15 Intel)
+    runs-on: macos-15-intel
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Intel host and release source manifest
+        run: |
+          test "$(uname -m)" = x86_64
+          python3 scripts/verify-source-manifest.py
+      - name: Build Universal 2 and run mounted DMG smoke natively on Intel
+        run: |
+          test "$(uname -m)" = x86_64
+          AI_CHECKER_CI_BOOTSTRAP=1 bash scripts/check-universal-build.sh
+      - name: Scope of Intel verification
+        run: echo 'Intel VM native packaged AppKit smoke only. Gatekeeper, accounts, notification UI and installed-app migration not evaluated.'

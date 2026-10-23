@@ -55,6 +55,29 @@ class PublicSourceContracts(unittest.TestCase):
                 self.assertFalse(line.endswith((b' ', b'\t')),
                                  f'{file}:{index}: trailing whitespace')
 
+    def test_codex_easy_connection_preserves_explicit_auth_and_cli_boundary(self):
+        app=(ROOT/'Sources/AIChecker/main.swift').read_text()
+        bridge=(ROOT/'Sources/AIChecker/CodexAccountClient.swift').read_text()
+        start=app.index('    private func beginEasyCodexConnection() {')
+        end=app.index('    @objc private func loginCodex()', start)
+        flow=app[start:end]
+        self.assertIn('addStayOpenRow("ChatGPTでかんたん接続…"', app)
+        self.assertIn('DispatchQueue.main.async { [weak self] in self?.beginEasyCodexConnection() }', app)
+        self.assertIn('guard CodexAccountClient.executable() != nil else', flow)
+        self.assertLess(flow.index('guard CodexAccountClient.executable() != nil else'),
+                        flow.index('accountConfig.addCodex('))
+        self.assertIn('accountConfig.accounts.first(where:', flow)
+        self.assertIn('accountConfig.addCodex(label: "個人Codex")', flow)
+        self.assertIn('connectSelectedAccount()', flow)
+        self.assertIn('codexClient?.login()', flow)
+        self.assertIn('https://github.com/openai/codex', flow)
+        self.assertIn('chooseCodexExecutable()', flow)
+        for forbidden in ('Process()', 'sudo ', 'curl -', 'npm install', 'brew install',
+                          'osascript', 'xattr ', 'Keychain', 'rm -rf'):
+            self.assertNotIn(forbidden, flow)
+        self.assertIn('child.arguments = ["app-server", "--listen", "stdio://"]', bridge)
+        self.assertIn('environment["CODEX_HOME"] = home.path', bridge)
+
     def test_docs_do_not_claim_pre_merge_or_old_version(self):
         readme=(ROOT/'README.md').read_text()
         ja=(ROOT/'docs/README.ja.md').read_text()

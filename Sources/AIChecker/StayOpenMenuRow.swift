@@ -16,7 +16,7 @@ final class StayOpenMenuRow: NSView {
     init(_ caption: String, checked: @escaping () -> Bool = { false },
          enabled: Bool = true, enabledWhen: @escaping () -> Bool = { true },
          symbolName: String? = nil, action: @escaping () -> Void) {
-        self.caption = caption
+        self.caption = AppL10n.text(caption)
         self.symbolName = symbolName
         self.current = checked
         self.available = { enabled && enabledWhen() }
@@ -24,7 +24,7 @@ final class StayOpenMenuRow: NSView {
         super.init(frame: NSRect(x: 0, y: 0, width: 250, height: 29))
         setAccessibilityElement(true)
         setAccessibilityRole(.button)
-        setAccessibilityLabel(caption)
+        setAccessibilityLabel(self.caption)
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }

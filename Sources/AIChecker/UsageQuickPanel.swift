@@ -48,14 +48,14 @@ final class UsageQuickPanel {
         inner.wantsLayer = true
         inner.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
 
-        let heading = NSTextField(labelWithString: "AI Checker  ·  利用状況")
+        let heading = NSTextField(labelWithString: AppL10n.text("AI Checker  ·  利用状況"))
         heading.font = NSFont.boldSystemFont(ofSize: 18)
         heading.frame = NSRect(x: 24, y: inner.bounds.height - 42, width: 560, height: 25)
         inner.addSubview(heading)
 
         let hintText = shortcutError == nil
-            ? "メニューバーから隠れても、このパネルで残量を確認できます"
-            : "ショートカットが登録できません。下の『キー』から変更してください。"
+            ? AppL10n.text("メニューバーから隠れても、このパネルで残量を確認できます")
+            : AppL10n.text("ショートカットが登録できません。下の『キー』から変更してください。")
         let hint = NSTextField(labelWithString: hintText)
         hint.font = NSFont.systemFont(ofSize: 11)
         hint.textColor = shortcutError == nil ? .secondaryLabelColor : .systemOrange
@@ -70,17 +70,17 @@ final class UsageQuickPanel {
             inner.addSubview(card)
         }
 
-        let displayLabel = NSTextField(labelWithString: "表示")
+        let displayLabel = NSTextField(labelWithString: AppL10n.text("表示"))
         displayLabel.frame = NSRect(x: 24, y: 55, width: 45, height: 20)
         inner.addSubview(displayLabel)
         let density = NSPopUpButton(frame: NSRect(x: 70, y: 50, width: 173, height: 28), pullsDown: false)
-        density.addItems(withTitles: ["通常", "省スペース", "アイコンのみ"])
+        density.addItems(withTitles: ["通常", "省スペース", "アイコンのみ"].map(AppL10n.text))
         density.selectItem(at: [MenuBarPresentation.standard, .compact, .iconOnly].firstIndex(of: mode) ?? 0)
         density.target = self
         density.action = #selector(setMode(_:))
         inner.addSubview(density)
 
-        let shortcutLabel = NSTextField(labelWithString: "キー")
+        let shortcutLabel = NSTextField(labelWithString: AppL10n.text("キー"))
         shortcutLabel.frame = NSRect(x: 257, y: 55, width: 45, height: 20)
         inner.addSubview(shortcutLabel)
         let key = NSPopUpButton(frame: NSRect(x: 296, y: 50, width: 209, height: 28), pullsDown: false)
@@ -90,10 +90,10 @@ final class UsageQuickPanel {
         key.action = #selector(setKey(_:))
         inner.addSubview(key)
 
-        let refresh = NSButton(title: "今すぐ更新", target: self, action: #selector(refreshAction))
+        let refresh = NSButton(title: AppL10n.text("今すぐ更新"), target: self, action: #selector(refreshAction))
         refresh.frame = NSRect(x: width - 132, y: 13, width: 110, height: 28)
         inner.addSubview(refresh)
-        let help = NSButton(title: "整理方法", target: self, action: #selector(guideAction))
+        let help = NSButton(title: AppL10n.text("整理方法"), target: self, action: #selector(guideAction))
         help.frame = NSRect(x: 20, y: 13, width: 110, height: 28)
         inner.addSubview(help)
 

@@ -30,9 +30,9 @@ final class CodexAccountClient {
         case missingBinary, invalidOutput, transportClosed, failed(String)
         var errorDescription: String? {
             switch self {
-            case .missingBinary: return "Codex CLIが見つかりません。codexの場所を設定してください。"
-            case .invalidOutput: return "Codex App Serverの応答形式が不正です。"
-            case .transportClosed: return "Codex App Serverとの接続が終了しました。"
+            case .missingBinary: return AppL10n.text("Codex CLIが見つかりません。codexの場所を設定してください。")
+            case .invalidOutput: return AppL10n.text("Codex App Serverの応答形式が不正です。")
+            case .transportClosed: return AppL10n.text("Codex App Serverとの接続が終了しました。")
             case .failed(let message): return message
             }
         }
@@ -97,7 +97,7 @@ final class CodexAccountClient {
             process = child
             input = stdin.fileHandleForWriting
             running = true
-            state("Codex App Serverに接続中…")
+            state(AppL10n.text("Codex App Serverに接続中…"))
             let output = stdout.fileHandleForReading
             DispatchQueue.global(qos: .utility).async { [weak self] in
                 while true {
@@ -110,7 +110,7 @@ final class CodexAccountClient {
             request("initialize", params: ["clientInfo": ["name": "ai_checker", "title": "AI Checker", "version": "1.3.0"]]) { [weak self] reply in
                 guard let self = self else { return }
                 switch reply {
-                case .failure: self.state("初期化に失敗しました"); self.stopInternal()
+                case .failure: self.state(AppL10n.text("初期化に失敗しました")); self.stopInternal()
                 case .success:
                     self.isInitialized = true
                     self.notify("initialized", params: [:])
@@ -119,7 +119,7 @@ final class CodexAccountClient {
                 }
             }
         } catch {
-            state("Codex App Serverを起動できません: \(error.localizedDescription)")
+            state(AppL10n.format("Codex App Serverを起動できません: %@", error.localizedDescription))
             stopInternal()
         }
     }
@@ -144,14 +144,14 @@ final class CodexAccountClient {
         send(request)
         queue.asyncAfter(deadline: .now() + 20) { [weak self] in
             guard let self = self, let callback = self.pending.removeValue(forKey: id) else { return }
-            callback(.failure(ClientError.failed("Codex応答がタイムアウトしました")))
+            callback(.failure(ClientError.failed(AppL10n.text("Codex応答がタイムアウトしました"))))
         }
     }
 
     private func consume(_ chunk: Data) {
         buffer.append(chunk)
         // Prevent unbounded memory if another executable writes unlimited text.
-        if buffer.count > 2_000_000 { state("Codex応答が大きすぎます"); stopInternal(); return }
+        if buffer.count > 2_000_000 { state(AppL10n.text("Codex応答が大きすぎます")); stopInternal(); return }
         while let newLine = buffer.firstIndex(of: 10) {
             let line = Data(buffer[..<newLine])
             buffer.removeSubrange(...newLine)
@@ -172,7 +172,7 @@ final class CodexAccountClient {
                         readAccount()
                     } else {
                         isLoggingIn = false
-                        state("ログインが完了しませんでした。再試行できます。")
+                        state(AppL10n.text("ログインが完了しませんでした。再試行できます。"))
                     }
                 } else if method == "account/updated" && !isLoggingIn {
                     readAccount()
@@ -183,7 +183,7 @@ final class CodexAccountClient {
 
     private func connectionClosed() {
         if stopRequested { return }
-        state("Codex App Serverが終了しました。次の操作で再接続してください。")
+        state(AppL10n.text("Codex App Serverが終了しました。次の操作で再接続してください。"))
         stopInternal()
     }
 
@@ -194,19 +194,19 @@ final class CodexAccountClient {
             case .failure:
                 self.authenticated = false
                 self.failure(.init(.networkUnavailable))
-                self.state("認証状態を確認できません")
+                self.state(AppL10n.text("認証状態を確認できません"))
             case .success(let result):
                 guard let account = result["account"] as? [String: Any], account["type"] as? String == "chatgpt" else {
                     self.authenticated = false
                     self.snapshot(nil)
                     self.failure(.init(.authenticationRequired))
-                    self.state("未接続：このプロフィールでChatGPTログインしてください")
+                    self.state(AppL10n.text("未接続：このプロフィールでChatGPTログインしてください"))
                     return
                 }
                 self.authenticated = true
                 let email = (account["email"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
                 let verified = email.isEmpty ? "" : " / \(String(email.prefix(64)))"
-                self.state("ChatGPT接続済み（\(self.profile.label)）\(verified)")
+                self.state(AppL10n.format("ChatGPT接続済み（%@）%@", self.profile.label, verified))
                 self.readLimits()
             }
         }
@@ -220,7 +220,7 @@ final class CodexAccountClient {
                 switch result {
                 case .failure:
                     self.failure(.init(.networkUnavailable))
-                    self.state("利用制限を取得できません。次回再試行します。")
+                    self.state(AppL10n.text("利用制限を取得できません。次回再試行します。"))
                 case .success(let reply):
                     if let valid = CodexAppServerQuotaDecoder.decodeResult(reply) {
                         self.snapshot(valid)
@@ -228,7 +228,7 @@ final class CodexAccountClient {
                         // Preserve last successful reading until freshness TTL;
                         // absence of a quota is not a logout or a zero percent.
                         self.failure(.init(.invalidResponse))
-                        self.state("利用制限が返されませんでした（前回値は期限付き保持）")
+                        self.state(AppL10n.text("利用制限が返されませんでした（前回値は期限付き保持）"))
                     }
                 }
             }
@@ -253,17 +253,17 @@ final class CodexAccountClient {
                 switch reply {
                 case .failure:
                     self.isLoggingIn = false
-                    self.state("ブラウザ認証を開始できませんでした")
+                    self.state(AppL10n.text("ブラウザ認証を開始できませんでした"))
                 case .success(let result):
                     guard let raw = result["authUrl"] as? String,
                           let url = URL(string: raw), url.scheme == "https",
                           let host = url.host?.lowercased(),
                           ["chatgpt.com", "auth.openai.com", "login.openai.com", "accounts.openai.com", "openai.com"].contains(host) else {
                         self.isLoggingIn = false
-                        self.state("Codexが有効な認証URLを返しませんでした")
+                        self.state(AppL10n.text("Codexが有効な認証URLを返しませんでした"))
                         return
                     }
-                    self.state("ブラウザでChatGPTログインを完了してください")
+                    self.state(AppL10n.text("ブラウザでChatGPTログインを完了してください"))
                     DispatchQueue.main.async { [weak self] in self?.onOpenBrowser?(url) }
                 }
             }
@@ -272,15 +272,15 @@ final class CodexAccountClient {
     func logout() {
         queue.async { [weak self] in
             guard let self = self else { return }
-            guard self.running else { self.state("Codex App Server未起動です。先に接続してください。") ; return }
+            guard self.running else { self.state(AppL10n.text("Codex App Server未起動です。先に接続してください。")) ; return }
             self.request("account/logout") { [weak self] result in
                 guard let self = self else { return }
                 switch result {
-                case .failure: self.state("ログアウトに失敗しました")
+                case .failure: self.state(AppL10n.text("ログアウトに失敗しました"))
                 case .success:
                     self.authenticated = false
                     self.snapshot(nil)
-                    self.state("切断済み（\(self.profile.label)）")
+                    self.state(AppL10n.format("切断済み（%@）", self.profile.label))
                 }
             }
         }

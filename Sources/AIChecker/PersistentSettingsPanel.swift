@@ -75,7 +75,7 @@ final class PersistentSettingsPanel: NSObject, NSWindowDelegate {
         func label(_ value: String, x: CGFloat, y: CGFloat, width: CGFloat,
                    size: CGFloat = 12, weight: NSFont.Weight = .regular,
                    secondary: Bool = false) {
-            let field = NSTextField(labelWithString: value)
+            let field = NSTextField(labelWithString: AppL10n.text(value))
             field.frame = NSRect(x: x, y: y, width: width, height: 23)
             field.font = .systemFont(ofSize: size, weight: weight)
             if secondary { field.textColor = .secondaryLabelColor }
@@ -83,7 +83,7 @@ final class PersistentSettingsPanel: NSObject, NSWindowDelegate {
         }
         func popup(_ choices: [String], y: CGFloat, action: Selector) -> NSPopUpButton {
             let control = NSPopUpButton(frame: NSRect(x: 217, y: y, width: 333, height: 29), pullsDown: false)
-            control.addItems(withTitles: choices)
+            control.addItems(withTitles: choices.map(AppL10n.text))
             control.target = self
             control.action = action
             content.addSubview(control)
@@ -101,7 +101,7 @@ final class PersistentSettingsPanel: NSObject, NSWindowDelegate {
               size: 12, weight: .semibold)
         for (id, title, x) in [("codex", "Codex を表示", CGFloat(47)),
                                 ("claude", "Claude を表示", CGFloat(277))] {
-            let button = NSButton(checkboxWithTitle: title, target: self,
+            let button = NSButton(checkboxWithTitle: AppL10n.text(title), target: self,
                                   action: #selector(changeDisplay(_:)))
             button.frame = NSRect(x: x, y: 454, width: 212, height: 26)
             providerButtons[id] = button
@@ -135,17 +135,17 @@ final class PersistentSettingsPanel: NSObject, NSWindowDelegate {
         label("個人課金なしなら請求APIを停止します。", x: 47, y: 117,
               width: 480, size: 11, secondary: true)
 
-        let login = NSButton(checkboxWithTitle: "ログイン時に自動起動", target: self,
+        let login = NSButton(checkboxWithTitle: AppL10n.text("ログイン時に自動起動"), target: self,
                              action: #selector(changeLaunchAtLogin(_:)))
         login.frame = NSRect(x: 47, y: 70, width: 365, height: 22)
         content.addSubview(login)
         launchButton = login
 
-        let reset = NSButton(title: "表示設定を初期化", target: self,
+        let reset = NSButton(title: AppL10n.text("表示設定を初期化"), target: self,
                              action: #selector(resetDisplay))
         reset.frame = NSRect(x: 29, y: 35, width: 170, height: 33)
         content.addSubview(reset)
-        let close = NSButton(title: "完了", target: self, action: #selector(closePanel))
+        let close = NSButton(title: AppL10n.text("完了"), target: self, action: #selector(closePanel))
         close.bezelStyle = .rounded
         close.keyEquivalent = "\r"
         close.frame = NSRect(x: 449, y: 35, width: 107, height: 33)

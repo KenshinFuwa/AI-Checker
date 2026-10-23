@@ -78,7 +78,7 @@ final class PersistentAccountsPanel: NSObject, NSWindowDelegate {
         let panel = NSPanel(contentRect: NSRect(x: 0, y: 0, width: width, height: height),
                             styleMask: [.titled, .closable, .miniaturizable],
                             backing: .buffered, defer: false)
-        panel.title = "AI Checker — アカウントと接続"
+        panel.title = AppL10n.text("AI Checker — アカウントと接続")
         panel.isReleasedWhenClosed = false
         panel.delegate = self
         panel.center()
@@ -89,18 +89,18 @@ final class PersistentAccountsPanel: NSObject, NSWindowDelegate {
         background.state = .active
         panel.contentView = background
 
-        let title = NSTextField(labelWithString: "ACCOUNTS  /  接続")
+        let title = NSTextField(labelWithString: AppL10n.text("ACCOUNTS  /  接続"))
         title.font = .systemFont(ofSize: 21, weight: .bold)
         title.frame = NSRect(x: 24, y: 510, width: 650, height: 29)
         background.addSubview(title)
-        let hint = NSTextField(labelWithString: "変更後もこの画面を維持します。接続情報は元の認証方式とKeychainに保存されます。")
+        let hint = NSTextField(labelWithString: AppL10n.text("変更後もこの画面を維持します。接続情報は元の認証方式とKeychainに保存されます。"))
         hint.font = .systemFont(ofSize: 11)
         hint.textColor = .secondaryLabelColor
         hint.frame = NSRect(x: 24, y: 488, width: 706, height: 18)
         background.addSubview(hint)
 
         for (index, section) in Section.allCases.enumerated() {
-            let button = NSButton(title: section.title, target: self, action: #selector(selectSection(_:)))
+            let button = NSButton(title: AppL10n.text(section.title), target: self, action: #selector(selectSection(_:)))
             button.tag = section.rawValue
             button.alignment = .left
             button.bezelStyle = .rounded
@@ -115,7 +115,7 @@ final class PersistentAccountsPanel: NSObject, NSWindowDelegate {
         scroll.borderType = .noBorder
         background.addSubview(scroll)
         scrollView = scroll
-        let close = NSButton(title: "完了", target: self, action: #selector(closePanel))
+        let close = NSButton(title: AppL10n.text("完了"), target: self, action: #selector(closePanel))
         close.bezelStyle = .rounded
         close.frame = NSRect(x: 640, y: 9, width: 95, height: 26)
         background.addSubview(close)
@@ -222,19 +222,19 @@ final class PersistentAccountsPanel: NSObject, NSWindowDelegate {
             let y = contentHeight - 33 - CGFloat(index) * rowHeight
             switch row {
             case .caption(let value):
-                let field = NSTextField(labelWithString: value)
+                let field = NSTextField(labelWithString: AppL10n.text(value))
                 field.font = .systemFont(ofSize: 12, weight: .semibold)
                 field.textColor = .secondaryLabelColor
                 field.frame = NSRect(x: 12, y: y, width: 483, height: 24)
                 document.addSubview(field)
             case .label(let value):
-                let field = NSTextField(labelWithString: value)
+                let field = NSTextField(labelWithString: AppL10n.text(value))
                 field.font = .systemFont(ofSize: 12)
                 field.lineBreakMode = .byTruncatingTail
                 field.frame = NSRect(x: 12, y: y, width: 480, height: 24)
                 document.addSubview(field)
             case .command(let title, let command, let enabled):
-                let button = NSButton(title: title, target: self, action: #selector(execute(_:)))
+                let button = NSButton(title: AppL10n.text(title), target: self, action: #selector(execute(_:)))
                 button.bezelStyle = .rounded
                 button.alignment = .left
                 button.isEnabled = enabled

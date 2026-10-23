@@ -1,11 +1,16 @@
 name: AI Checker source validation
 on:
   push:
-    branches: [main, 'release/**', 'feature/**']
+    branches: [main, 'release/**']
   pull_request:
   workflow_dispatch:
 permissions:
   contents: read
+# A feature PR must not pay for duplicate push + pull_request builds.
+# Cancel outdated runs when a newer update arrives on the same PR.
+concurrency:
+  group: ai-checker-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   core-linux:
     name: Swift core and source checks (Ubuntu)

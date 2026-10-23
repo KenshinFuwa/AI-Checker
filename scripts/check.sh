@@ -66,6 +66,7 @@ print('PASS: public Claude Web network access disabled; CLI statusLine retained'
 PYVALIDATE
 python3 Tests/test_public_release.py
 python3 Tests/test_distribution_release.py
+python3 Tests/test_localization_integration.py
 python3 Tests/test_release_checksum.py
 python3 Tests/test_free_preview.py
 python3 Tests/test_packaged_bootstrap.py

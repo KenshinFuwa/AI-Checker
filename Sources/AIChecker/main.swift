@@ -163,11 +163,11 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         // pre-existing Cmd+R shortcut on the app's keyboard command menu.
         let actionsItem = NSMenuItem(title: "Actions", action: nil, keyEquivalent: "")
         let actionsMenu = NSMenu(title: "Actions")
-        let refreshItem = NSMenuItem(title: "今すぐ更新", action: #selector(refreshNow), keyEquivalent: "r")
+        let refreshItem = NSMenuItem(title: AppL10n.text("今すぐ更新"), action: #selector(refreshNow), keyEquivalent: "r")
         refreshItem.target = self
         refreshItem.keyEquivalentModifierMask = [.command]
         actionsMenu.addItem(refreshItem)
-        let panelItem = NSMenuItem(title: "利用状況パネルを開く", action: #selector(showQuickPanel), keyEquivalent: "")
+        let panelItem = NSMenuItem(title: AppL10n.text("利用状況パネルを開く"), action: #selector(showQuickPanel), keyEquivalent: "")
         panelItem.target = self
         actionsMenu.addItem(panelItem)
         mainMenu.addItem(actionsItem)
@@ -703,6 +703,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         MenuVisualStyle.adorn(quit, symbol: "power.circle")
         menu.addItem(quit)
         menu.delegate = self
+        AppL10n.apply(to: menu)
         item.menu = menu
         pendingMenuRefresh = false
     }

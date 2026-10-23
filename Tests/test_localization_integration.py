@@ -70,6 +70,12 @@ class LocalizationContracts(unittest.TestCase):
         self.assertIn('AppL10n.format("ChatGPT接続済み（%@）%@", self.profile.label, verified)', codex)
         self.assertIn('AppL10n.format("%@の制限がリセットされました（残り%d%%）"', notification)
 
+    def test_offline_codex_bridge_includes_portable_localizer(self):
+        helper = (ROOT / 'Sources/AIChecker/AppLocalization.swift').read_text()
+        bridge = (ROOT / 'scripts/test-codex-bridge.sh').read_text()
+        self.assertIn('#if canImport(AppKit)', helper)
+        self.assertIn('Sources/AIChecker/AppLocalization.swift', bridge)
+
     def test_all_distribution_paths_ship_localized_resources(self):
         stage = (ROOT / 'scripts/stage-release-app.sh').read_text()
         local = (ROOT / 'scripts/install-local.sh').read_text()

@@ -644,6 +644,16 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         }
         menu.addItem(.separator())
         menu.addItem(MenuVisualStyle.heading("ACCOUNTS  /  接続"))
+        // First-time Codex users should reach the official ChatGPT login in one
+        // deliberate menu action when an official Codex CLI is already installed.
+        addStayOpenRow("ChatGPTでかんたん接続…", to: menu,
+                       enabledWhen: { [weak self] in
+                           guard let self else { return false }
+                           return !self.sleeping && !self.demo
+                       }, symbolName: "person.crop.circle.badge.checkmark") { [weak self] in
+            // NSAlert and the system browser must not be opened inside menu tracking.
+            DispatchQueue.main.async { [weak self] in self?.beginEasyCodexConnection() }
+        }
         addAccountsSubmenu("Codexアカウント管理", section: .codex,
                            symbol: "person.crop.circle", to: menu)
         addAccountsSubmenu("Claudeアカウント管理", section: .claude,
@@ -1322,6 +1332,60 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
               accountConfig.selectCodex(id) else { return }
         saveAccounts()
         connectSelectedAccount()
+    }
+
+    // Deliberate, single-entry-point onboarding. No CLI installer is launched.
+    // Existing accounts and the user's default ~/.codex remain untouched.
+    private func beginEasyCodexConnection() {
+        guard !demo, !sleeping else { return }
+        // Verify the official CLI executable is present BEFORE creating a new
+        // empty profile or mutating the user's account selection.
+        guard CodexAccountClient.executable() != nil else {
+            showCodexInstallationGuide()
+            return
+        }
+        if accountConfig.activeCodex == nil {
+            if let existing = accountConfig.accounts.first(where: { $0.providerID == "codex" }) {
+                guard accountConfig.selectCodex(existing.id) else { return }
+            } else {
+                guard let profile = accountConfig.addCodex(label: "個人Codex"),
+                      accountConfig.selectCodex(profile.id) else {
+                    let alert = NSAlert()
+                    alert.messageText = "Codexプロフィールを作成できませんでした"
+                    alert.informativeText = "アカウント管理画面から登録状況を確認してください。"
+                    alert.runModal()
+                    return
+                }
+            }
+            saveAccounts()
+            connectSelectedAccount()
+        } else if codexClient == nil {
+            connectSelectedAccount()
+        }
+        // The official app-server generates the browser authentication URL.
+        // AI Checker never handles the ChatGPT password or OAuth tokens.
+        codexClient?.login()
+    }
+
+    private func showCodexInstallationGuide() {
+        let alert = NSAlert()
+        alert.messageText = "OpenAI公式Codex CLIが見つかりません"
+        alert.informativeText = "ChatGPTで接続するには、OpenAI公式Codex CLIが必要です。公式の導入手順を確認し、インストール後に「ChatGPTでかんたん接続」を再度選んでください。既に別の場所へインストール済みの場合は実行ファイルを指定できます。AI Checkerはインストールコマンドを無断実行しません。"
+        alert.addButton(withTitle: "公式の導入手順を見る")
+        alert.addButton(withTitle: "CLIの場所を選択…")
+        alert.addButton(withTitle: "閉じる")
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            if let url = URL(string: "https://github.com/openai/codex") {
+                NSWorkspace.shared.open(url)
+            }
+        case .alertSecondButtonReturn:
+            chooseCodexExecutable()
+            // If selection was cancelled, simply return; no second dialog.
+            if CodexAccountClient.executable() != nil { beginEasyCodexConnection() }
+        default:
+            break
+        }
     }
 
     @objc private func loginCodex() { codexClient?.login() }

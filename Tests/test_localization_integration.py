@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 PAIR = re.compile(r'^"((?:\\.|[^"\\])*)" = "((?:\\.|[^"\\])*)";$')
-JAPANESE = re.compile(r'[\\u3040-\\u30ff\\u3400-\\u9fff]')
+JAPANESE = re.compile(r'[\u3040-\u30ff\u3400-\u9fff]')
 
 
 def entries(path):

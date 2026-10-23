@@ -1,4 +1,4 @@
-> **Release status (2026-10-22):** Open-source v1.10.1 source beta is merged into `main`. GitHub Actions has passed portable Swift checks, native macOS builds/tests, and an unsigned Universal 2 (arm64 + x86_64) temporary-DMG layout audit. **No Developer ID-signed/notarized app or official end-user DMG release exists.** An optional **manual, explicitly unnotarized test-only DMG** can be produced without Apple membership; this is not an official release and may be blocked by Gatekeeper. See [free preview cautions](docs/FREE_PREVIEW.ja.md). Intel and Apple Silicon clean-install testing remain outstanding.
+> **Release status (2026-10-24 JST):** Open-source v1.10.1 source beta is merged into `main`. GitHub Actions run `39977688759` passed all four PR checks: portable Swift source/core, native macOS build/tests, unsigned Universal 2 temporary-DMG audit, and isolated packaged AppKit bootstrap on a native `macos-15-intel` x86_64 VM. The Intel check does **not** exercise a normal installation, Gatekeeper, real accounts, notifications, or the app event loop. **No Developer ID-signed/notarized public DMG exists.** An optional manual, explicitly unnotarized test-only DMG can be produced without Apple membership; it is not an official release and may be blocked by Gatekeeper. See [free preview cautions](docs/FREE_PREVIEW.ja.md). Clean installation on physical Apple Silicon and Intel Macs remains unverified.
 
 # AI Checker
 
@@ -60,7 +60,7 @@ There is **no notarized `.dmg` / public installer** in this source-only beta. Do
 ./scripts/check.sh
 ```
 
-The script runs Swift unit tests, Python policy/regression tests, a local Codex App Server mock and macOS native checks when running on a Mac. GitHub Actions has separate **portable Linux source/core**, **native macOS**, and **unsigned Universal 2 + temporary DMG layout** jobs. The Linux job excludes the Codex RPC integration test; only the Mac job runs the full `check.sh`. All three must actually pass before merge. Real provider logins, real notification delivery and macOS menu interaction require separate interactive testing.
+The script runs Swift unit tests, Python policy/regression tests, a local Codex App Server mock and macOS native checks when running on a Mac. GitHub Actions runs **four** checks: portable Linux source/core, native macOS build and tests, unsigned Universal 2 temporary-DMG layout and packaged AppKit smoke, and separate native Intel macOS VM packaged AppKit smoke. The Linux job excludes the Codex RPC integration test; only the macOS native job runs the full `check.sh`. All four passed for PR #7 (`39977688759`). CI smoke is not proof of clean end-user installation, notarization, or complete UI operation. Real provider logins, real notification delivery and macOS menu interaction require separate interactive testing.
 
 ## Data and privacy
 

@@ -1918,6 +1918,41 @@ if CommandLine.arguments.contains("--ingest-claude-statusline") {
     } else {
         print("Claude · 利用率未取得")
     }
+} else if CommandLine.arguments.contains("--selftest-packaged-bootstrap") {
+    // Noninteractive AppKit bootstrap from the actual .app bundle.
+    // NEVER load account data, register login items, request notifications,
+    // contact providers, or start the application's event loop here.
+    guard Bundle.main.bundleURL.pathExtension == "app",
+          Bundle.main.bundleIdentifier == "dev.aichecker.localapp",
+          Bundle.main.infoDictionary?["CFBundleExecutable"] as? String == "AIChecker",
+          Bundle.main.infoDictionary?["LSUIElement"] as? Bool == true,
+          let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
+          let appIcon = NSImage(contentsOf: iconURL), appIcon.isValid else {
+        fputs("FAIL: packaged application identity or icon\n", stderr)
+        exit(1)
+    }
+    let application = NSApplication.shared
+    application.setActivationPolicy(.accessory)
+    application.applicationIconImage = appIcon
+    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    guard let button = statusItem.button,
+          let launcherIcon = StatusArtwork.renderLauncherIcon(),
+          launcherIcon.isValid else {
+        fputs("FAIL: AppKit status item or launcher artwork\n", stderr)
+        exit(1)
+    }
+    button.image = launcherIcon
+    let smokeMenu = NSMenu(title: "AI Checker Bootstrap Test")
+    smokeMenu.addItem(withTitle: "Bootstrap OK", action: nil, keyEquivalent: "")
+    statusItem.menu = smokeMenu
+    guard statusItem.menu?.items.count == 1,
+          application.applicationIconImage?.isValid == true else {
+        fputs("FAIL: AppKit menu or bundle icon assignment\n", stderr)
+        exit(1)
+    }
+    NSStatusBar.system.removeStatusItem(statusItem)
+    print("PASS: packaged AppKit bootstrap, menu-bar item, icon and identity")
+    print("TEST_SCOPE: no user data, no network, no login item, no notification, no event loop")
 } else if CommandLine.arguments.contains("--selftest-status-layout") {
     // Native AppKit font measurements, without opening a menu or an account.
     let catalog = AIProviderRegistry.catalog

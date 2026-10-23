@@ -24,9 +24,9 @@ final class QuotaNotificationCenter: NSObject, UNUserNotificationCenterDelegate 
         content.title = "AI Checker · \(provider)"
         switch event.kind {
         case .reset:
-            content.body = "\(event.window.label)の制限がリセットされました（残り\(Int(event.remainingPercent.rounded()))%）"
+            content.body = AppL10n.format("%@の制限がリセットされました（残り%d%%）", event.window.label, Int(event.remainingPercent.rounded()))
         case .exhausted:
-            content.body = "\(event.window.label)の利用可能枠を使い切りました"
+            content.body = AppL10n.format("%@の利用可能枠を使い切りました", event.window.label)
         }
         content.sound = .default
         // Actual unique transitions are already deduplicated by the monitor.
@@ -44,31 +44,31 @@ final class QuotaNotificationCenter: NSObject, UNUserNotificationCenterDelegate 
         center.getNotificationSettings { settings in
             let authorization: String
             switch settings.authorizationStatus {
-            case .authorized: authorization = "許可済み"
-            case .denied: authorization = "拒否されています"
-            case .notDetermined: authorization = "未確認（許可を求めていません）"
-            case .provisional: authorization = "仮許可（通知が静かに届く場合があります）"
-            case .ephemeral: authorization = "一時的に許可"
-            @unknown default: authorization = "不明"
+            case .authorized: authorization = AppL10n.text("許可済み")
+            case .denied: authorization = AppL10n.text("拒否されています")
+            case .notDetermined: authorization = AppL10n.text("未確認（許可を求めていません）")
+            case .provisional: authorization = AppL10n.text("仮許可（通知が静かに届く場合があります）")
+            case .ephemeral: authorization = AppL10n.text("一時的に許可")
+            @unknown default: authorization = AppL10n.text("不明")
             }
             let banner: String
             switch settings.alertStyle {
-            case .banner: banner = "バナー"
-            case .alert: banner = "通知パネル"
-            case .none: banner = "画面表示なし"
-            @unknown default: banner = "不明"
+            case .banner: banner = AppL10n.text("バナー")
+            case .alert: banner = AppL10n.text("通知パネル")
+            case .none: banner = AppL10n.text("画面表示なし")
+            @unknown default: banner = AppL10n.text("不明")
             }
             let sound = settings.soundSetting == .enabled ? "ON" : "OFF"
             let centerSetting = settings.notificationCenterSetting == .enabled ? "ON" : "OFF"
-            let result = "macOS通知許可: \(authorization)\n表示形式: \(banner)\n通知センター: \(centerSetting)\n通知音: \(sound)\n\n集中モードや通知要約の設定により、許可済みでもバナーが表示されない場合があります。"
+            let result = AppL10n.format("macOS通知許可: %@\n表示形式: %@\n通知センター: %@\n通知音: %@\n\n集中モードや通知要約の設定により、許可済みでもバナーが表示されない場合があります。", authorization, banner, centerSetting, sound)
             DispatchQueue.main.async { completion(result) }
         }
     }
 
     func sendTestNotification(completion: @escaping (Error?) -> Void) {
         let content = UNMutableNotificationContent()
-        content.title = "AI Checker · 通知テスト"
-        content.body = "通知の準備ができました。残量の変化は実データから判定します。"
+        content.title = AppL10n.text("AI Checker · 通知テスト")
+        content.body = AppL10n.text("通知の準備ができました。残量の変化は実データから判定します。")
         content.sound = .default
         center.add(UNNotificationRequest(identifier: "AIChecker.test.\(UUID().uuidString)",
                                          content: content, trigger: nil)) { error in

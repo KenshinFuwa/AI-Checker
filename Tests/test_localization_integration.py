@@ -57,6 +57,19 @@ class LocalizationContracts(unittest.TestCase):
             source = (ROOT / 'Sources/AIChecker' / filename).read_text()
             self.assertIn('AppL10n.text(', source, filename)
 
+    def test_localized_codex_and_notification_status(self):
+        en = entries(ROOT / 'Localization/en.lproj/Localizable.strings')
+        codex = (ROOT / 'Sources/AIChecker/CodexAccountClient.swift').read_text()
+        notification = (ROOT / 'Sources/AIChecker/QuotaNotificationCenter.swift').read_text()
+        for key in ('Codex App Serverに接続中…', 'ブラウザでChatGPTログインを完了してください',
+                    'ChatGPT接続済み（%@）%@', '切断済み（%@）',
+                    '%@の制限がリセットされました（残り%d%%）',
+                    '%@の利用可能枠を使い切りました',
+                    '通知の準備ができました。残量の変化は実データから判定します。'):
+            self.assertIn(key, en)
+        self.assertIn('AppL10n.format("ChatGPT接続済み（%@）%@", self.profile.label, verified)', codex)
+        self.assertIn('AppL10n.format("%@の制限がリセットされました（残り%d%%）"', notification)
+
     def test_all_distribution_paths_ship_localized_resources(self):
         stage = (ROOT / 'scripts/stage-release-app.sh').read_text()
         local = (ROOT / 'scripts/install-local.sh').read_text()

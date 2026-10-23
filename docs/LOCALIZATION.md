@@ -22,8 +22,9 @@ auditor independently verifies the resources in the mounted bundle.
 ## Current coverage and limitations
 
 This branch migrates the common menu navigation, the Accounts panel, the
-Preferences panel, and the Usage panel. Some provider-specific status messages,
-complex interpolated messages, alerts and notifications are **not yet migrated**.
+Preferences panel, the Usage panel, Codex connection messages, and quota
+notification content. Other provider messages and detailed configuration
+alerts are **not yet migrated**.
 They may still appear in Japanese on an English-language Mac. This is a
 tracked incomplete localization, **not a claim that the entire app is bilingual**.
 

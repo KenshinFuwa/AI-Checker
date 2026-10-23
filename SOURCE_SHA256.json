@@ -1,7 +1,7 @@
 {
   "algorithm": "SHA-256",
   "version": "1.10.1-beta.1",
-  "file_count": 129,
+  "file_count": 130,
   "files": {
     ".github/workflows/mac-validation.yml": "c02eb75c92f961322b1fe54f03e76ffdb0faa34b9fa4b0e439a31eeeeab92b5d",
     ".github/workflows/unnotarized-preview.yml": "47a6312aa69ae2dafa0455184a30991e18261b36f83d31685f78782b21fddbed",
@@ -17,12 +17,12 @@
     "docs/legacy/README_JA.md": "35f8b3e823fed745fe0a7daee9a4318545e8a07d9cd7fda4011d6f1fc484a73e",
     "docs/legacy/README.md": "c9e646beaf51f98b9e165c4922ef25379928f8451af4fd23250da16102b1cb31",
     "docs/legacy/VALIDATION.md": "3dd4511709d47ad70fd0ea234e3310f958a2583225020ed0424079cb3bf74f51",
-    "docs/LOCALIZATION.md": "f867af7a58b8d5dca7ae260b854931bd53d273004b0baad0011dbeed67e8f13b",
+    "docs/LOCALIZATION.md": "bbaaf8f040edc5cbba2535e3435cc1a6e2f20909e55ea406d52641f67a2da4b4",
     "docs/PUBLISH_PR.md": "ce4cd172dee40dbf356538afa13e5c362a08e4f77cb4f80542b447f012249a0c",
     "docs/README.ja.md": "01e79a5d0662380a1e7bcba5c5ff6d6c9ab7fef32a65e7e38eafaae9a2418bd8",
     "LICENSE": "34a4f77b5c680a10ea28e35a6d42ee45bc546f533684a590db333123a7f10973",
-    "Localization/en.lproj/Localizable.strings": "5fcb1ffecd984a57c575c3e6b19b0810e70a687b78f50c81a97be6ab002ec4c3",
-    "Localization/ja.lproj/Localizable.strings": "47eb4bd22d1454287d24c05ccf978d7a494767ddddbbf28b75d215734f7efbd5",
+    "Localization/en.lproj/Localizable.strings": "454ce09fa2e477e191d467f752f4c58790438c6df4cd09b07ff2a39873af0c5b",
+    "Localization/ja.lproj/Localizable.strings": "6eb6095308c23782c1aa5da6a1bda0ebf4794d9d02286eff3bbeab3b919091fc",
     "Package.swift": "b60fb2a19437f7a67e238ae1b88d955d733ee2fee134962af98c63cd0e36986f",
     "PUBLICATION_AUDIT.md": "c68b1f6c544c1fbe44504dce92d4fd246a32a9e460eb097602640fd47f5b70ae",
     "PUBLICATION_CHECKLIST.md": "8d2760b062b9ae3e8fad5af49a3a8a7030d4af8fdebfea5b1481e4d55302410b",
@@ -121,7 +121,7 @@
     "Tests/test_free_preview.py": "df5fb7adbfc40122e605113cc9bdf44e88bfbe222a6327d41f8a5113e9b5f157",
     "Tests/test_installer_offline.py": "92dd666c959ee681069f312b4e80a3594cae07110a81239c1fa58bf419ddde2f",
     "Tests/test_live_settings_preview.py": "2c91f49ec9369d15fb008043ca8d8237fd7fcd5bf56789b676d71212090a7337",
-    "Tests/test_localization_integration.py": "71bc3e340e4306cbaba4233101334256f1d5f960267f5d22cf4d9ec3c0df3268",
+    "Tests/test_localization_integration.py": "18cd7c4476386c9c72ef0b6e06b0822a7a6fb0625732b3b4c5f9209ceb0cc493",
     "Tests/test_menu_bar_fallback.py": "c78e1a0f7e7e1b32ed08498d9b4f885cf86082f1943d2814d3d0d61ba1f36fb2",
     "Tests/test_menu_bar_provider_selection.py": "72849a309586bb511f41491e407547504e0a8b07da67041396cc67ea5ccaf9ee",
     "Tests/test_network_speed_and_spotlight.py": "aa2fb3b37b24c6c6822840af72ecb58c22559827e4a4c65ac35cd0172b0d617c",
@@ -131,6 +131,7 @@
     "Tests/test_quota_notifications_integration.py": "02d9188e70ce5d0f5c45ee10dce49e8c9261a20b771463e59006b6dfe887e938",
     "Tests/test_release_checksum.py": "35a0722f6879f80bc1649975558071adefd9d8ebbccdeea7eecf920cde60314b",
     "Tests/test_release_invariants.py": "1e4ac6184db76b76aa525900ebb88c0d34b79f3b8c8b7c2a04a2906f9e9d890e",
-    "Tests/test_spotlight_reopen.py": "dfd042f295b69eabfef00f8af06bbdc7920af069d819b3e9e25b57dce3fb9dff"
+    "Tests/test_spotlight_reopen.py": "dfd042f295b69eabfef00f8af06bbdc7920af069d819b3e9e25b57dce3fb9dff",
+    "docs/FREE_SOURCE_BUILD.md": "eba116124cc795fe73ff250a8e10ecbd163bc07f7f570dbc09a9ce4895a0ee9e"
   }
 }

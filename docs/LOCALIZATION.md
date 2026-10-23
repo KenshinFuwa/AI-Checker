@@ -41,7 +41,7 @@ documentation.
 ## Zero-cost development and validation
 
 No Apple Developer Program membership is required to build AI Checker from
-source and test it locally on your own Mac. The current workflow intentionally
+source and test it locally on your own Mac. See [the free source-build guide](FREE_SOURCE_BUILD.md). The current workflow intentionally
 does not distribute a Developer ID-signed or notarized download. A public
 source release is distinct from an independently verified installer.
 

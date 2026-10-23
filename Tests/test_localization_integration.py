@@ -43,6 +43,17 @@ class LocalizationContracts(unittest.TestCase):
         self.assertEqual(info['CFBundleDevelopmentRegion'], 'en')
         self.assertEqual(info['CFBundleLocalizations'], ['en', 'ja'])
 
+    def test_newline_translation_keys_match_runtime_swift_strings(self):
+        # Swift string literals interpret backslash-n as a line break.
+        # In .strings the key must also decode to a real line break,
+        # rather than a literal two-character backslash-n sequence.
+        for lang in ('en', 'ja'):
+            raw = (ROOT / 'Localization' / f'{lang}.lproj' /
+                   'Localizable.strings').read_text()
+            self.assertNotIn('\\\\n', raw, f'{lang}: escaped newline mismatch')
+        english = entries(ROOT / 'Localization/en.lproj/Localizable.strings')
+        self.assertIn('メニューバーに空きがないと、macOSがアイコンを表示できないことがあります。\\n\\n', english)
+
     def test_native_bundled_lookup_and_primary_navigation(self):
         app = (ROOT / 'Sources/AIChecker/AppLocalization.swift').read_text()
         main = (ROOT / 'Sources/AIChecker/main.swift').read_text()

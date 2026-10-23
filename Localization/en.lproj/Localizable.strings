@@ -2,10 +2,10 @@
 "%@の制限がリセットされました（残り%d%%）" = "%@ quota reset (%d%% remaining)";
 "%@の利用可能枠を使い切りました" = "%@ quota exhausted";
 "0pt（最小）" = "0pt (Minimum)";
-"1. AI Checkerの表示設定で『アイコンのみ』または『省スペース』を選択します。\\n" = "1. Select Icon Only or Compact in AI Checker display settings.\\n";
-"2. システム設定 → メニューバー（macOSのバージョンによって項目名が異なります）で不要な標準アイコンを整理します。\\n" = "2. Review system icons in System Settings > Menu Bar (name varies by macOS version).\\n";
-"3. 他社アプリは各アプリの設定でメニューバー表示をOFFにします。\\n" = "3. Disable unnecessary menu bar icons in each third-party app's settings.\\n";
-"4. AI Checkerが隠れていても、設定したショートカットで利用状況パネルを開けます。\\n\\n" = "4. The configured shortcut still opens the usage panel when the icon is hidden.\\n\\n";
+"1. AI Checkerの表示設定で『アイコンのみ』または『省スペース』を選択します。\n" = "1. Select Icon Only or Compact in AI Checker display settings.\n";
+"2. システム設定 → メニューバー（macOSのバージョンによって項目名が異なります）で不要な標準アイコンを整理します。\n" = "2. Review system icons in System Settings > Menu Bar (name varies by macOS version).\n";
+"3. 他社アプリは各アプリの設定でメニューバー表示をOFFにします。\n" = "3. Disable unnecessary menu bar icons in each third-party app's settings.\n";
+"4. AI Checkerが隠れていても、設定したショートカットで利用状況パネルを開けます。\n\n" = "4. The configured shortcut still opens the usage panel when the icon is hidden.\n\n";
 "5時間・週間のリセット時に通知" = "Notify on Five-Hour and Weekly Reset";
 "5時間・週間の残量を使い切ったら通知" = "Notify When Five-Hour or Weekly Quota Is Exhausted";
 "ACCOUNTS  /  接続" = "ACCOUNTS / CONNECTIONS";
@@ -83,10 +83,10 @@
 "GitHub Copilot使用量を接続" = "Connect GitHub Copilot Billing Usage";
 "GitHub Copilot連携を解除しますか？" = "Disconnect GitHub Copilot?";
 "GitHubユーザー名（例: octocat）" = "GitHub Username (e.g. octocat)";
-"GitHub公式の個人向け請求APIは、自分で購入したプランが対象です。Free／未契約／組織管理の使用枠はここから取得できません。\\n\\n続行すると、保存済みトークンがあれば個人請求APIを読み取る設定に変わります。" = "GitHub's personal billing API only supports eligible personally paid plans. It cannot report Free, unsubscribed, or organization-managed quotas.\\n\\nContinuing will enable the billing API using a previously stored token if one exists.";
+"GitHub公式の個人向け請求APIは、自分で購入したプランが対象です。Free／未契約／組織管理の使用枠はここから取得できません。\n\n続行すると、保存済みトークンがあれば個人請求APIを読み取る設定に変わります。" = "GitHub's personal billing API only supports eligible personally paid plans. It cannot report Free, unsubscribed, or organization-managed quotas.\n\nContinuing will enable the billing API using a previously stored token if one exists.";
 "Keychainのキーを削除して切断…" = "Remove Keychain Key and Disconnect…";
 "macOSの『システム設定 → 通知 → AI Checker』で通知を許可してから、もう一度有効にしてください。" = "Enable notifications for AI Checker in System Settings > Notifications, then try again.";
-"macOS通知許可: %@\\\\n表示形式: %@\\\\n通知センター: %@\\\\n通知音: %@\\\\n\\\\n集中モードや通知要約の設定により、許可済みでもバナーが表示されない場合があります。" = "macOS permission: %@\\\\nPresentation: %@\\\\nNotification Center: %@\\\\nSound: %@\\\\n\\\\nFocus and notification summaries may suppress banners even when enabled.";
+"macOS通知許可: %@\n表示形式: %@\n通知センター: %@\n通知音: %@\n\n集中モードや通知要約の設定により、許可済みでもバナーが表示されない場合があります。" = "macOS permission: %@\nPresentation: %@\nNotification Center: %@\nSound: %@\n\nFocus and notification summaries may suppress banners even when enabled.";
 "OFFICIAL API REPORTS  /  組織・チーム向け" = "OFFICIAL API REPORTS / ORGANIZATIONS & TEAMS";
 "OpenAI公式Codex CLIが見つかりません" = "Official OpenAI Codex CLI Not Found";
 "SYNC  /  更新" = "SYNC / REFRESH";
@@ -123,7 +123,7 @@
 "プロフィールを追加…" = "Add Profile…";
 "メニューバーから隠れても、このパネルで残量を確認できます" = "You can check remaining quotas here even when the menu bar icon is hidden.";
 "メニューバーにAI Checkerが表示されない場合" = "If AI Checker Is Missing from the Menu Bar";
-"メニューバーに空きがないと、macOSがアイコンを表示できないことがあります。\\n\\n" = "When the menu bar is full, macOS may hide the AI Checker icon.\\n\\n";
+"メニューバーに空きがないと、macOSがアイコンを表示できないことがあります。\n\n" = "When the menu bar is full, macOS may hide the AI Checker icon.\n\n";
 "メニューバーに表示" = "Show in Menu Bar";
 "メニューバーに表示するAI" = "AI Services Shown in Menu Bar";
 "メニューバーの整理方法…" = "How to Free Menu Bar Space…";

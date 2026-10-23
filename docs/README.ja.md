@@ -8,7 +8,7 @@
 - GitHub Copilot／OpenAI API／Cursor Team／xAI API：請求量・管理API利用量であり、個人向けチャット枠ではない。
 - ChatGPT・Gemini・Perplexity・Cursor個人版・Grok個人版：公式サイトを既定ブラウザで開き、手動でメモできる。**残量自動取得ではない**。
 
-このソース公開版には、再配布権が未確認のCodex・Claude公式ロゴ画像を含めません。コード内のベクター代替マークを利用します。2026年10月22日時点でv1.10.1のソースはGitHubの`main`に反映済みで、macOS・Linux・Universal 2とDMGレイアウトのCIが成功しています。ただし**Developer ID署名・Apple公証済みアプリや一般ユーザー向け正式DMGは未公開**です。年会費不要の[未公証テスト版の作成方法と注意](FREE_PREVIEW.ja.md)も参照できます。
+このソース公開版には、再配布権が未確認のCodex・Claude公式ロゴ画像を含めません。コード内のベクター代替マークを利用します。2026年10月24日時点でv1.10.1のソースはGitHubの`main`に反映済みで、Linux、macOS、Universal 2／DMG、Intel x86_64専用macOS VMでの隔離AppKit起動の計4ジョブがすべて成功しています（Actions run `39977688759`）。Intelの検証はDMG内の限定的な起動試験であり、実機へのクリーンインストール、Gatekeeper、アカウント、通知、通常イベントループは未検証です。ただし**Developer ID署名・Apple公証済みアプリや一般ユーザー向け正式DMGは未公開**です。年会費不要の[未公証テスト版の作成方法と注意](FREE_PREVIEW.ja.md)も参照できます。
 
 ## メニューバーがいっぱいになったとき
 

@@ -70,6 +70,7 @@ cat > "$STAGE/Contents/Info.plist" <<'PLIST'
 <key>CFBundleName</key><string>AI Checker</string>
 <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
 <key>CFBundleDevelopmentRegion</key><string>en</string>
+<key>CFBundleLocalizations</key><array><string>en</string><string>ja</string></array>
 <key>CFBundleIconFile</key><string>AppIcon.icns</string>
 <key>CFBundleDisplayName</key><string>AI Checker</string>
 <key>CFBundlePackageType</key><string>APPL</string>
@@ -89,6 +90,18 @@ else
     echo 'ERROR: original AI Checker AppIcon.icns is missing.' >&2
     exit 3
 fi
+# Ship the same localized resources in both local and distributable bundles.
+# Fail before touching the running installation if any localization is missing.
+for LANGUAGE in en ja; do
+    RESOURCE="$ROOT/Localization/$LANGUAGE.lproj/Localizable.strings"
+    [[ -s "$RESOURCE" && ! -L "$RESOURCE" ]] || {
+        echo "ERROR: missing $LANGUAGE localization." >&2; exit 3;
+    }
+    plutil -lint "$RESOURCE" >/dev/null
+    mkdir -p "$STAGE/Contents/Resources/$LANGUAGE.lproj"
+    cp "$RESOURCE" "$STAGE/Contents/Resources/$LANGUAGE.lproj/Localizable.strings"
+    cmp "$RESOURCE" "$STAGE/Contents/Resources/$LANGUAGE.lproj/Localizable.strings"
+done
 # Standard macOS application bundle marker. Written before signing.
 printf 'APPL????' > "$STAGE/Contents/PkgInfo"
 plutil -lint "$STAGE/Contents/Info.plist"

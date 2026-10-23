@@ -341,8 +341,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     private func showMenuBarHelp() {
         let alert = NSAlert()
-        alert.messageText = "メニューバーにAI Checkerが表示されない場合"
-        alert.informativeText = "メニューバーに空きがないと、macOSがアイコンを表示できないことがあります。\n\n" +
+        alert.messageText = AppL10n.text("メニューバーにAI Checkerが表示されない場合")
+        alert.informativeText = AppL10n.text("メニューバーに空きがないと、macOSがアイコンを表示できないことがあります。\n\n") +
             "1. AI Checkerの表示設定で『アイコンのみ』または『省スペース』を選択します。\n" +
             "2. システム設定 → メニューバー（macOSのバージョンによって項目名が異なります）で不要な標準アイコンを整理します。\n" +
             "3. 他社アプリは各アプリの設定でメニューバー表示をOFFにします。\n" +
@@ -997,9 +997,9 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         if !UserDefaults.standard.bool(forKey: consentKey) {
             let alert = NSAlert()
             alert.messageText = "\(destination.name)公式サイトをAI Checker内で開きますか？"
-            alert.informativeText = "ログイン情報はAI Checker専用のWebKitストレージに保存されます（macOS 14以降）。通常のSafari・Chrome等のログインとは分離されます。AI CheckerはパスワードやCookieを読み取りません。使用量を自動取得する機能ではありません。Google等の認証がWebKitを拒否する場合は既定ブラウザーを利用してください。"
-            alert.addButton(withTitle: "開く")
-            alert.addButton(withTitle: "キャンセル")
+            alert.informativeText = AppL10n.text("ログイン情報はAI Checker専用のWebKitストレージに保存されます（macOS 14以降）。通常のSafari・Chrome等のログインとは分離されます。AI CheckerはパスワードやCookieを読み取りません。使用量を自動取得する機能ではありません。Google等の認証がWebKitを拒否する場合は既定ブラウザーを利用してください。")
+            alert.addButton(withTitle: AppL10n.text("開く"))
+            alert.addButton(withTitle: AppL10n.text("キャンセル"))
             guard alert.runModal() == .alertFirstButtonReturn else { return }
             UserDefaults.standard.set(true, forKey: consentKey)
         }
@@ -1017,19 +1017,19 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         guard let destination = ConsumerWebAccess.destination(for: providerID) else { return }
         let alert = NSAlert()
         alert.messageText = "\(destination.name) — 手動記録"
-        alert.informativeText = "公式サイトに実際に表示された残量やリセット時刻だけを記録してください（120文字まで）。これはメモであり、自動更新・認証済みの数値ではありません。APIキー、パスワード、Cookie、個人情報は絶対に入力しないでください。"
-        alert.addButton(withTitle: "手動記録を保存")
-        alert.addButton(withTitle: "キャンセル")
+        alert.informativeText = AppL10n.text("公式サイトに実際に表示された残量やリセット時刻だけを記録してください（120文字まで）。これはメモであり、自動更新・認証済みの数値ではありません。APIキー、パスワード、Cookie、個人情報は絶対に入力しないでください。")
+        alert.addButton(withTitle: AppL10n.text("手動記録を保存"))
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
         let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 430, height: 28))
-        field.placeholderString = "例: Proモデル 残り28%、リセット 18:00"
+        field.placeholderString = AppL10n.text("例: Proモデル 残り28%、リセット 18:00")
         field.stringValue = consumerNotes[providerID]?.text ?? ""
         alert.accessoryView = field
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         guard let note = ConsumerUsageNote(providerID: providerID, text: field.stringValue,
                                            recordedAt: Date()) else {
             let invalid = NSAlert()
-            invalid.messageText = "手動記録を保存できませんでした"
-            invalid.informativeText = "空欄・改行・120文字超過・資格情報を含む値は保存できません。"
+            invalid.messageText = AppL10n.text("手動記録を保存できませんでした")
+            invalid.informativeText = AppL10n.text("空欄・改行・120文字超過・資格情報を含む値は保存できません。")
             invalid.runModal()
             return
         }
@@ -1043,8 +1043,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         alert.alertStyle = .warning
         alert.messageText = "専用ブラウザーの\(providerID)ログインデータを削除しますか？"
         alert.informativeText = "AI Checker内の専用WebKitセッションだけを削除します。Safari・Chrome・公式アプリのログインには影響しません。手動記録は保持します。"
-        alert.addButton(withTitle: "キャンセル")
-        alert.addButton(withTitle: "削除")
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
+        alert.addButton(withTitle: AppL10n.text("削除"))
         guard alert.runModal() == .alertSecondButtonReturn else { return }
         consumerWebSessions.removeValue(forKey: providerID)?.stop()
         let key = "AIChecker.consumer.v1.webStore.\(providerID)"
@@ -1053,7 +1053,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             DispatchQueue.main.async {
                 if error == nil { UserDefaults.standard.removeObject(forKey: key) }
                 let result = NSAlert()
-                result.messageText = error == nil ? "専用ログインデータを削除しました" : "削除できませんでした"
+                result.messageText = error == nil ? AppL10n.text("専用ログインデータを削除しました") : AppL10n.text("削除できませんでした")
                 if let error { result.informativeText = error.localizedDescription }
                 result.runModal()
             }
@@ -1195,8 +1195,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     @objc private func openClaudeWeb() {
         let alert = NSAlert()
-        alert.messageText = "Claude Web連携は公開版では利用できません"
-        alert.informativeText = "Claude CodeのstatusLine連携を使用してください。"
+        alert.messageText = AppL10n.text("Claude Web連携は公開版では利用できません")
+        alert.informativeText = AppL10n.text("Claude CodeのstatusLine連携を使用してください。")
         alert.runModal()
     }
 
@@ -1224,8 +1224,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         saveAccounts()
         changedClaudeProfile()
         let alert = NSAlert()
-        alert.messageText = "Claudeプロフィールを追加しました"
-        alert.informativeText = "公開版ではClaude Code公式のstatusLine連携を利用してください。非公開のClaude Web利用量APIにはアクセスしません。"
+        alert.messageText = AppL10n.text("Claudeプロフィールを追加しました")
+        alert.informativeText = AppL10n.text("公開版ではClaude Code公式のstatusLine連携を利用してください。非公開のClaude Web利用量APIにはアクセスしません。")
         alert.runModal()
     }
 
@@ -1242,13 +1242,13 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         do {
             let connect = try ClaudeProfileClient.prepare(profile, executable: binary)
             let alert = NSAlert()
-            alert.messageText = "Claude Code公式ログイン環境を開きます"
-            alert.informativeText = "TerminalでClaude Codeを起動します。必要なら公式ログインを行い、/statusでアカウントを確認してください。AI Checkerは専用CLAUDE_CONFIG_DIRだけを設定しますが、Claude側のKeychain等の共有認証状態まで分離できる保証はありません。既存の ~/.claude は変更しません。"
-            alert.addButton(withTitle: "Terminalで開く")
-            alert.addButton(withTitle: "キャンセル")
+            alert.messageText = AppL10n.text("Claude Code公式ログイン環境を開きます")
+            alert.informativeText = AppL10n.text("TerminalでClaude Codeを起動します。必要なら公式ログインを行い、/statusでアカウントを確認してください。AI Checkerは専用CLAUDE_CONFIG_DIRだけを設定しますが、Claude側のKeychain等の共有認証状態まで分離できる保証はありません。既存の ~/.claude は変更しません。")
+            alert.addButton(withTitle: AppL10n.text("Terminalで開く"))
+            alert.addButton(withTitle: AppL10n.text("キャンセル"))
             guard alert.runModal() == .alertFirstButtonReturn else { return }
             if !NSWorkspace.shared.open(connect) {
-                showClaudeError("Terminalで.commandを開けませんでした。Finderから専用connect.commandを開いてください。")
+                showClaudeError(AppL10n.text("Terminalで.commandを開けませんでした。Finderから専用connect.commandを開いてください。"))
             }
         } catch {
             showClaudeError(error.localizedDescription)
@@ -1258,7 +1258,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
     private func showClaudeError(_ message: String) {
         let alert = NSAlert()
         alert.alertStyle = .warning
-        alert.messageText = "Claude Codeの準備に失敗しました"
+        alert.messageText = AppL10n.text("Claude Codeの準備に失敗しました")
         alert.informativeText = message
         alert.runModal()
     }
@@ -1276,8 +1276,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = "\(profile.label)の専用設定を削除しますか？"
-        alert.informativeText = "専用CLAUDE_CONFIG_DIRとキャッシュが削除されます。Claude Code公式の認証失効は保証しません。先にClaude Codeの/login・/logoutなどでアカウント状態を確認してください。共有 ~/.claude は削除しません。"
-        alert.addButton(withTitle: "キャンセル")
+        alert.informativeText = AppL10n.text("専用CLAUDE_CONFIG_DIRとキャッシュが削除されます。Claude Code公式の認証失効は保証しません。先にClaude Codeの/login・/logoutなどでアカウント状態を確認してください。共有 ~/.claude は削除しません。")
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
         alert.addButton(withTitle: "専用設定を削除")
         guard alert.runModal() == .alertSecondButtonReturn else { return }
         let dir = ClaudeProfileClient.root(profile.id)
@@ -1305,9 +1305,9 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
     private func accountPrompt(_ title: String, preset: String) -> String? {
         let alert = NSAlert()
         alert.messageText = title
-        alert.informativeText = "アカウント識別用の表示名です。パスワードは入力しないでください。"
-        alert.addButton(withTitle: "保存")
-        alert.addButton(withTitle: "キャンセル")
+        alert.informativeText = AppL10n.text("アカウント識別用の表示名です。パスワードは入力しないでください。")
+        alert.addButton(withTitle: AppL10n.text("保存"))
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
         let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 340, height: 24))
         field.stringValue = preset
         alert.accessoryView = field
@@ -1323,8 +1323,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         saveAccounts()
         connectSelectedAccount()
         let alert = NSAlert()
-        alert.messageText = "専用Codexプロフィールを追加しました"
-        alert.informativeText = "このプロフィールは研究室の ~/.codex と独立しています。ブラウザログインはメニューから明示的に実行してください。"
+        alert.messageText = AppL10n.text("専用Codexプロフィールを追加しました")
+        alert.informativeText = AppL10n.text("このプロフィールは研究室の ~/.codex と独立しています。ブラウザログインはメニューから明示的に実行してください。")
         alert.runModal()
     }
 
@@ -1352,8 +1352,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
                 guard let profile = accountConfig.addCodex(label: "個人Codex"),
                       accountConfig.selectCodex(profile.id) else {
                     let alert = NSAlert()
-                    alert.messageText = "Codexプロフィールを作成できませんでした"
-                    alert.informativeText = "アカウント管理画面から登録状況を確認してください。"
+                    alert.messageText = AppL10n.text("Codexプロフィールを作成できませんでした")
+                    alert.informativeText = AppL10n.text("アカウント管理画面から登録状況を確認してください。")
                     alert.runModal()
                     return
                 }
@@ -1370,11 +1370,11 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     private func showCodexInstallationGuide() {
         let alert = NSAlert()
-        alert.messageText = "OpenAI公式Codex CLIが見つかりません"
-        alert.informativeText = "ChatGPTで接続するには、OpenAI公式Codex CLIが必要です。公式の導入手順を確認し、インストール後に「ChatGPTでかんたん接続」を再度選んでください。既に別の場所へインストール済みの場合は実行ファイルを指定できます。AI Checkerはインストールコマンドを無断実行しません。"
-        alert.addButton(withTitle: "公式の導入手順を見る")
-        alert.addButton(withTitle: "CLIの場所を選択…")
-        alert.addButton(withTitle: "閉じる")
+        alert.messageText = AppL10n.text("OpenAI公式Codex CLIが見つかりません")
+        alert.informativeText = AppL10n.text("ChatGPTで接続するには、OpenAI公式Codex CLIが必要です。公式の導入手順を確認し、インストール後に「ChatGPTでかんたん接続」を再度選んでください。既に別の場所へインストール済みの場合は実行ファイルを指定できます。AI Checkerはインストールコマンドを無断実行しません。")
+        alert.addButton(withTitle: AppL10n.text("公式の導入手順を見る"))
+        alert.addButton(withTitle: AppL10n.text("CLIの場所を選択…"))
+        alert.addButton(withTitle: AppL10n.text("閉じる"))
         switch alert.runModal() {
         case .alertFirstButtonReturn:
             if let url = URL(string: "https://github.com/openai/codex") {
@@ -1404,7 +1404,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         alert.alertStyle = .warning
         alert.messageText = "\(profile.label)を削除しますか？"
         alert.informativeText = "AI Checker専用のCODEX_HOMEフォルダーを削除します。先に『ログアウト』を行ってください。Codexが別の保管先に保存した資格情報は残る場合があります。通常の ~/.codex は変更しません。"
-        alert.addButton(withTitle: "キャンセル")
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
         alert.addButton(withTitle: "プロフィールと認証情報を削除")
         guard alert.runModal() == .alertSecondButtonReturn else { return }
         codexClient?.stopAndWait()
@@ -1417,8 +1417,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             }
         } catch {
             let failure = NSAlert()
-            failure.messageText = "認証情報を削除できませんでした"
-            failure.informativeText = "安全のためプロフィールはそのまま残します。"
+            failure.messageText = AppL10n.text("認証情報を削除できませんでした")
+            failure.informativeText = AppL10n.text("安全のためプロフィールはそのまま残します。")
             failure.runModal()
             connectSelectedAccount()
             return
@@ -1470,10 +1470,10 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
               selected != copilotAccessMode else { return }
         if selected == .personallyBilled {
             let confirm = NSAlert()
-            confirm.messageText = "個人で購入したCopilotプランですか？"
-            confirm.informativeText = "GitHub公式の個人向け請求APIは、自分で購入したプランが対象です。Free／未契約／組織管理の使用枠はここから取得できません。\n\n続行すると、保存済みトークンがあれば個人請求APIを読み取る設定に変わります。"
-            confirm.addButton(withTitle: "個人課金APIを許可")
-            confirm.addButton(withTitle: "キャンセル")
+            confirm.messageText = AppL10n.text("個人で購入したCopilotプランですか？")
+            confirm.informativeText = AppL10n.text("GitHub公式の個人向け請求APIは、自分で購入したプランが対象です。Free／未契約／組織管理の使用枠はここから取得できません。\n\n続行すると、保存済みトークンがあれば個人請求APIを読み取る設定に変わります。")
+            confirm.addButton(withTitle: AppL10n.text("個人課金APIを許可"))
+            confirm.addButton(withTitle: AppL10n.text("キャンセル"))
             guard confirm.runModal() == .alertFirstButtonReturn else { return }
         }
         // Fail closed before mutating visible state or persisting the new mode.
@@ -1494,36 +1494,36 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     @objc private func showCopilotScopeInfo() {
         let alert = NSAlert()
-        alert.messageText = "Copilotの利用区分について"
+        alert.messageText = AppL10n.text("Copilotの利用区分について")
         alert.informativeText = "GitHubへのログインだけでは、Copilotの契約や残量は分かりません。\n\n現在の公式個人請求APIは自分で購入したCopilotプランの課金使用量用であり、Copilot Freeの残り枠を確認するAPIではありません。\n\nFree・未契約・組織管理を選んだ場合は請求APIの通信を停止します。過去のトークンはここから明示的に削除できます。\n\n選択した利用区分は自己申告であり、AI Checkerが契約を検証した結果ではありません。"
-        alert.addButton(withTitle: "閉じる")
+        alert.addButton(withTitle: AppL10n.text("閉じる"))
         alert.runModal()
     }
 
     @objc private func showCopilotTroubleshooting() {
         let alert = NSAlert()
-        alert.messageText = "GitHub Copilot使用量 — エラーの確認"
+        alert.messageText = AppL10n.text("GitHub Copilot使用量 — エラーの確認")
         alert.informativeText = "HTTP 401: トークン無効・失効。GitHub側で再発行を確認。\n\nHTTP 403: トークンの Account permissions → Plan: Read が必要。個人ではなく学校・組織がCopilotを支払う場合は、個人の請求APIに使用量が出ません。API制限による403もあります。\n\nHTTP 404: GitHubユーザー名や個人請求データの有無を確認。\n\nHTTP 429: 一時的なアクセス制限。自動再試行を待ってください。\n\n利用量はPremium Requestsの当月使用数で、Codexの5h/週の残量ではありません。トークン自体はこの画面に表示しません。"
-        alert.addButton(withTitle: "閉じる")
+        alert.addButton(withTitle: AppL10n.text("閉じる"))
         alert.runModal()
     }
 
     @objc private func configureCopilotAccount() {
         guard copilotAccessMode.permitsPersonalBillingAPI else { showCopilotScopeInfo(); return }
         let alert = NSAlert()
-        alert.messageText = "GitHub Copilot使用量を接続"
+        alert.messageText = AppL10n.text("GitHub Copilot使用量を接続")
         alert.informativeText = "GitHubのFine-grained PAT（Plan: Read）と個人ユーザー名を入力。資格情報はmacOS Keychainのみに保存し、公式GitHub請求APIの当月使用数を取得します。組織負担プランや5時間/週の残量は対象外です。"
         alert.addButton(withTitle: "保存して取得")
-        alert.addButton(withTitle: "キャンセル")
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
         let username = NSTextField(frame: NSRect(x: 0, y: 50, width: 390, height: 24))
-        username.placeholderString = "GitHubユーザー名（例: octocat）"
+        username.placeholderString = AppL10n.text("GitHubユーザー名（例: octocat）")
         username.stringValue = copilotClient.username ?? ""
         let token = NSSecureTextField(frame: NSRect(x: 0, y: 38, width: 390, height: 24))
         token.placeholderString = "Fine-grained personal access token（Plan: Read）"
         let pasteButton = NSButton(title: "クリップボードから貼り付け",
                                    target: self, action: #selector(pasteCopilotToken(_:)))
         pasteButton.frame = NSRect(x: 181, y: 2, width: 209, height: 28)
-        pasteButton.toolTip = "押したときだけクリップボードを読み取ります。入力は黒丸で隠れます。"
+        pasteButton.toolTip = AppL10n.text("押したときだけクリップボードを読み取ります。入力は黒丸で隠れます。")
         let panel = NSView(frame: NSRect(x: 0, y: 0, width: 390, height: 102))
         username.frame.origin.y = 74
         panel.addSubview(username)
@@ -1540,8 +1540,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             copilotClient.requestUsage(force: true)
         } else {
             let invalid = NSAlert()
-            invalid.messageText = "接続設定を保存できませんでした"
-            invalid.informativeText = "ユーザー名・トークンまたはKeychainの書き込み権限を確認してください。"
+            invalid.messageText = AppL10n.text("接続設定を保存できませんでした")
+            invalid.informativeText = AppL10n.text("ユーザー名・トークンまたはKeychainの書き込み権限を確認してください。")
             invalid.runModal()
         }
         renderUI()
@@ -1576,10 +1576,10 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     @objc private func disconnectCopilot() {
         let alert = NSAlert()
-        alert.messageText = "GitHub Copilot連携を解除しますか？"
+        alert.messageText = AppL10n.text("GitHub Copilot連携を解除しますか？")
         alert.informativeText = "AI CheckerのKeychain内の個人トークンだけを削除します。GitHub側で発行済みのトークン自体を失効させるものではありません。"
-        alert.addButton(withTitle: "削除して切断")
-        alert.addButton(withTitle: "キャンセル")
+        alert.addButton(withTitle: AppL10n.text("削除して切断"))
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         copilotClient.disconnect()
         copilotReport = nil
@@ -1622,7 +1622,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         alert.messageText = "\(kind.name) — 公式APIレポート接続"
         alert.informativeText = "\(kind.scope)のみ取得します。5時間/週のチャット残量とは別です。APIキーはmacOS Keychainに保存。必要な権限と契約は公式サービス側で設定してください。管理用キーは高権限のため、必ず信頼できる個人のMacでのみ利用してください。"
         alert.addButton(withTitle: "Keychainに保存して取得")
-        alert.addButton(withTitle: "キャンセル")
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
         let panel = NSView(frame: NSRect(x: 0, y: 0, width: 410, height: kind.requiresTeamID ? 90 : 55))
         let token = NSSecureTextField(frame: NSRect(x: 0, y: kind.requiresTeamID ? 46 : 15, width: 410, height: 25))
         token.placeholderString = kind == .openaiAPI ? "OpenAI organization admin key" :
@@ -1647,7 +1647,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             }
         } else {
             let failure = NSAlert()
-            failure.messageText = "接続設定を保存できませんでした"
+            failure.messageText = AppL10n.text("接続設定を保存できませんでした")
             failure.informativeText = "APIキー、Team ID (UUID)、Keychain書き込み権限を確認してください。"
             failure.runModal()
         }
@@ -1669,8 +1669,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         let alert = NSAlert()
         alert.messageText = "\(kind.name)とのAPI連携を解除しますか？"
         alert.informativeText = "このMacのKeychainに保存された専用キーを削除します。発行元サービス上のAPIキーは失効しません。"
-        alert.addButton(withTitle: "削除して切断")
-        alert.addButton(withTitle: "キャンセル")
+        alert.addButton(withTitle: AppL10n.text("削除して切断"))
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         client.disconnect()
         externalReports.removeValue(forKey: kind)
@@ -1748,8 +1748,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
                 self.saveQuotaNotificationSettings()
             } else {
                 let alert = NSAlert()
-                alert.messageText = "通知が許可されていません"
-                alert.informativeText = "macOSの『システム設定 → 通知 → AI Checker』で通知を許可してから、もう一度有効にしてください。"
+                alert.messageText = AppL10n.text("通知が許可されていません")
+                alert.informativeText = AppL10n.text("macOSの『システム設定 → 通知 → AI Checker』で通知を許可してから、もう一度有効にしてください。")
                 alert.runModal()
             }
         }
@@ -1777,14 +1777,14 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
                     self.quotaNotifier.sendTestNotification { [weak self] error in
                         guard self != nil, let error else { return }
                         let alert = NSAlert()
-                        alert.messageText = "テスト通知の送信に失敗しました"
+                        alert.messageText = AppL10n.text("テスト通知の送信に失敗しました")
                         alert.informativeText = error.localizedDescription
                         alert.runModal()
                     }
                 } else {
                     let alert = NSAlert()
-                    alert.messageText = "通知が許可されていません"
-                    alert.informativeText = "システム設定 → 通知 → AI Checker を確認してください。"
+                    alert.messageText = AppL10n.text("通知が許可されていません")
+                    alert.informativeText = AppL10n.text("システム設定 → 通知 → AI Checker を確認してください。")
                     alert.runModal()
                 }
             }
@@ -1797,7 +1797,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
                 let reset = self.quotaNotificationSettings.notifyOnReset ? "ON" : "OFF"
                 let exhaustion = self.quotaNotificationSettings.notifyOnExhaustion ? "ON" : "OFF"
                 let alert = NSAlert()
-                alert.messageText = "AI Checkerの通知診断"
+                alert.messageText = AppL10n.text("AI Checkerの通知診断")
                 alert.informativeText = "リセット通知: \(reset)\n使い切り通知: \(exhaustion)\n\n\(systemStatus)\n\n実際の通知は新しい残量データによる状態変化時のみ発火します。最初から0%の場合や更新失敗時は通知しません。"
                 alert.addButton(withTitle: "OK")
                 alert.runModal()

@@ -39,6 +39,16 @@ EXE="$APP/Contents/MacOS/AIChecker"
 cmp "$ROOT/Design/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns" || {
     echo 'ERROR: packaged app icon differs from audited source.' >&2; exit 3;
 }
+for LANGUAGE in en ja; do
+    RESOURCE="$APP/Contents/Resources/$LANGUAGE.lproj/Localizable.strings"
+    [[ -f "$RESOURCE" && ! -L "$RESOURCE" ]] || {
+        echo "ERROR: missing bundled $LANGUAGE localization." >&2; exit 3;
+    }
+    plutil -lint "$RESOURCE" >/dev/null
+    cmp "$ROOT/Localization/$LANGUAGE.lproj/Localizable.strings" "$RESOURCE" || {
+        echo "ERROR: $LANGUAGE bundle translation mismatch." >&2; exit 3;
+    }
+done
 python3 - "$APP/Contents/Info.plist" "$APP/Contents/PkgInfo" <<'PYPLIST'
 import plistlib,sys,pathlib
 p=pathlib.Path(sys.argv[1])
@@ -49,6 +59,8 @@ expected={
     'CFBundleShortVersionString':'1.10.1',
     'CFBundleIconFile':'AppIcon.icns',
     'CFBundlePackageType':'APPL',
+    'CFBundleDevelopmentRegion':'en',
+    'CFBundleLocalizations':['en','ja'],
     'LSUIElement':True,
 }
 for k,v in expected.items():

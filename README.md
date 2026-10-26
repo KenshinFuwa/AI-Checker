@@ -1,10 +1,10 @@
-> **Release status (2026-10-24 JST):** Open-source v1.10.1 source beta is merged into `main`. GitHub Actions run `39977688759` passed all four PR checks: portable Swift source/core, native macOS build/tests, unsigned Universal 2 temporary-DMG audit, and isolated packaged AppKit bootstrap on a native `macos-15-intel` x86_64 VM. The Intel check does **not** exercise a normal installation, Gatekeeper, real accounts, notifications, or the app event loop. **No Developer ID-signed/notarized public DMG exists.** An optional manual, explicitly unnotarized test-only DMG can be produced without Apple membership; it is not an official release and may be blocked by Gatekeeper. See [free preview cautions](docs/FREE_PREVIEW.ja.md). Clean installation on physical Apple Silicon and Intel Macs remains unverified.
+> **Release candidate status (2026-10-26 JST):** GitHub access is restored and the public `main` branch remains at `c237d3fa74733414775a2808542508efd995783b`. The isolated **RC2.3 owner-Mac QA passed 8/8** on 2026-10-25 (Python 115 tests, Swift 114 tests, native release build, Codex mock and Universal 2/temporary-DMG checks); the tested source ZIP SHA-256 is `c3f2ce23e1cfb0d499a200dd9f24c80a6565c6c5392f5218b700865cbe386e4c`. This documentation-only publication synchronization does **not** change that tested application code. It is **not yet merged or released**: owner-reviewed pull request, CI for its exact commit, and live GUI/account validation remain outstanding. No Developer ID-signed/notarized public installer exists. See [release gate](RELEASE_GATE.md).
 
 # AI Checker
 
 **Native macOS menu-bar usage monitor — source-only beta (`v1.10.1-beta.1`).**
 
-[日本語ガイド](docs/README.ja.md) · [Security](SECURITY.md) · [Build & release checklist](PUBLICATION_CHECKLIST.md) · [Changelog](CHANGELOG.md)
+[Security](SECURITY.md) · [Build & release checklist](PUBLICATION_CHECKLIST.md) · [Changelog](CHANGELOG.md)
 
 AI Checker shows **Codex** and **Claude** usage windows in a compact menu-bar display. It supports native cascading menus, live appearance changes, three menu-bar densities, adjustable bar/number widths, reset/depletion notifications, multiple profiles, and explicit usage data sources.
 
@@ -23,6 +23,8 @@ This is an **independent, unofficial project**. It is not affiliated with, spons
 | GitHub Copilot | Optional personal **billing** usage; *not* 5-hour/weekly quota |
 | OpenAI API / Cursor Team / xAI API | Optional official **administrative usage/cost** reports; not consumer chat quota |
 | ChatGPT / Gemini / Perplexity / Cursor consumer / Grok consumer | Open provider sites in your default browser; optional manual notes. **No automated usage acquisition** |
+
+**Claude statusLine availability:** The supported `rate_limits.five_hour` and `rate_limits.seven_day` fields appear only for eligible Claude Code subscriptions after a session has received its first API response. A window can be independently absent or disappear after its reset, and the Mac menu then displays unknown rather than inventing a percentage. The source beta does not periodically log in to the Claude website, does not fetch undocumented endpoints, and does not guarantee continuously fresh Claude usage while Claude Code is idle or closed. See the [official Claude Code statusLine schema](https://code.claude.com/docs/en/statusline). A working privately installed app using an experimental Claude Web source is **not** proof that the public build's first-party-only Claude reader works end to end.
 
 Unknown or stale usage is not displayed as a fabricated percentage. Notifications only apply to monitored, automatically reported Codex/Claude account windows.
 
@@ -50,7 +52,7 @@ cd AI-Checker
 swift build -c release --jobs 2
 ```
 
-**Run locally**: To use the app as a menubar bundle, follow the macOS installation instructions in [the Japanese/English install guide](docs/INSTALL.md). The maintainers' original `scripts/install-local.sh` is intended for **existing locally signed installs** and requires the same trusted code signing identity; it will not silently replace an app signed differently. Do not share API tokens or signing certificates.
+**Run locally**: To use the app as a menubar bundle, follow the macOS installation instructions in [the source installation guide](docs/INSTALL.md). The maintainers' original `scripts/install-local.sh` is intended for **existing locally signed installs** and requires the same trusted code signing identity; it will not silently replace an app signed differently. Do not share API tokens or signing certificates.
 
 There is **no notarized `.dmg` / public installer** in this source-only beta. Do not represent a local ad-hoc build as notarized.
 
@@ -60,7 +62,7 @@ There is **no notarized `.dmg` / public installer** in this source-only beta. Do
 ./scripts/check.sh
 ```
 
-The script runs Swift unit tests, Python policy/regression tests, a local Codex App Server mock and macOS native checks when running on a Mac. GitHub Actions runs **four** checks: portable Linux source/core, native macOS build and tests, unsigned Universal 2 temporary-DMG layout and packaged AppKit smoke, and separate native Intel macOS VM packaged AppKit smoke. The Linux job excludes the Codex RPC integration test; only the macOS native job runs the full `check.sh`. All four passed for PR #7 (`39977688759`). CI smoke is not proof of clean end-user installation, notarization, or complete UI operation. Real provider logins, real notification delivery and macOS menu interaction require separate interactive testing.
+The script runs Swift unit tests, Python policy/regression tests, a local Codex App Server mock and macOS native checks when running on a Mac. GitHub Actions runs **four** checks: portable Linux source/core, native macOS build and tests, unsigned Universal 2 temporary-DMG layout and packaged AppKit smoke, and separate native Intel macOS VM packaged AppKit smoke. The Linux job excludes the Codex RPC integration test; only the macOS native job runs the full `check.sh`. The previously recorded four CI checks passed on run `39977688759`; verify the exact current commit and CI status on GitHub once access is available. CI smoke is not proof of clean end-user installation, notarization, or complete UI operation. Real provider logins, real notification delivery and macOS menu interaction require separate interactive testing.
 
 ## Data and privacy
 
@@ -83,7 +85,7 @@ The local/private v1.9.2 app and this source-only public beta are **not feature-
 
 ## Feature preview / contributing
 
-The source code is already public at `KenshinFuwa/AI-Checker`. The historical `scripts/publish-github.sh` is for the initial release only; **do not rerun it**. After local macOS native checks, maintainers can run `bash scripts/propose-github-beta.sh` from a fresh extracted candidate to create a feature branch and pull request. This does not push to `main` or publish an executable. Review the GitHub Actions results before merging.
+The source code is already public at `KenshinFuwa/AI-Checker`. The historical GitHub publication scripts are disabled and fail closed; do not bypass these guards. For future changes, follow [the guarded publication guide](docs/PUBLISH_PR.md); do not run initial-publication scripts or push while repository access is restricted. A PR and source release still require an owner-reviewed remote diff and GitHub CI.
 
 ## End-user distribution
 
@@ -116,7 +118,7 @@ Initial speed after 0.5s; one counter read per second; a weighted 2-second avera
 
 ## Menu-bar provider selection (v1.10.1)
 
-In Display Settings → メニューバーに表示するAI, choose Codex, Claude, or configured official billing/API report connections. Newly connected services are opt-in, and missing monthly reports are shown as `—`, not guessed percentages. ChatGPT, Gemini, Perplexity, Cursor consumer, and Grok consumer have no automated personal quota readers. GitHub Copilot and API usage reports are separate monthly counters, not 5h/Week quotas. Changing providers never modifies account tokens or authentication.
+In Display Settings → AI services shown in the menu bar, choose Codex, Claude, or configured official billing/API report connections. Newly connected services are opt-in, and missing monthly reports are shown as `—`, not guessed percentages. ChatGPT, Gemini, Perplexity, Cursor consumer, and Grok consumer have no automated personal quota readers. GitHub Copilot and API usage reports are separate monthly counters, not 5h/Week quotas. Changing providers never modifies account tokens or authentication.
 
 ## Spotlight / Finder application icon (v1.10.1)
 
@@ -125,3 +127,5 @@ This release standardizes the signed `.app` bundle icon (`CFBundleIconFile=AppIc
 The earlier Mac diagnosis showed that the icon resource and importer were valid **but that the installed app was missing from the Spotlight search index**. This is not proof that the app can repair Spotlight itself. Run `bash scripts/diagnose-app-identity.sh` after installation: it separately checks the bundle icon, Launch Services, AppKit-resolved icon, and Spotlight indexing, including comparison with system apps. No automatic whole-disk Spotlight resets or disruptive cache kills are performed.
 
 A macOS-native build, Finder icon, Notification Center icon, and actual Spotlight UI search all require final testing on a Mac. A passing Linux/Swift core test is not a claim that the OS indexing issue has been fixed.
+
+Release documentation: [RC1 native QA evidence and remaining gates](RELEASE_GATE.md) · [Source beta release notes](RELEASE_NOTES.md).

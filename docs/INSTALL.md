@@ -45,10 +45,10 @@ The public source ZIP contains **no external logo PNGs**, no Keychain exports, n
 
 ## Contributing a feature beta after publication
 
-This repository is already public. Do **not** run the historic first-publication script again. From a fresh extracted feature ZIP on macOS, run `bash scripts/propose-github-beta.sh` to validate the native AppKit build, confirm `KenshinFuwa`, create an isolated feature branch, and open a pull request. It does not overwrite the local installed app or push to `main`. Inspect GitHub Actions and review the changes before merging.
+This repository is already public. Both historical publication entry points are disabled. **Do not run** `scripts/publish-github.sh` or `scripts/propose-github-beta.sh`. Once GitHub account access has been restored, follow `docs/PUBLISH_PR.md`: review current remote HEAD, compare the candidate diff, run native QA, inspect staged files for secrets, obtain explicit owner approval, and submit one reviewed PR through standard Git tools. Do not overwrite the installed app or push directly to `main`.
 
 New installs should show a one-time usage panel with keyboard fallback instructions. The stable updater also copies the independent `Design/AppIcon.icns` into the signed app bundle before verifying the signature.
 
 ## D. Manually generated UNNOTARIZED test preview (not an end-user release)
 
-For a controlled test on an isolated Mac, see [the explicit risk and build instructions](FREE_PREVIEW.ja.md). It uses only an ad-hoc signature and cannot establish the publisher identity. Do not overwrite an existing AI Checker app or disable Gatekeeper globally.
+For a controlled test on an isolated Mac, see [the explicit risk and build instructions](UNNOTARIZED_TEST_PREVIEW.md). It uses only an ad-hoc signature and cannot establish the publisher identity. Do not overwrite an existing AI Checker app or disable Gatekeeper globally.

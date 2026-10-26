@@ -15,7 +15,7 @@ final class UsageSpeedHeaderView: NSView {
     required init?(coder: NSCoder) { fatalError("Not supported") }
 
     func begin() {
-        label = "測定中…"
+        label = AppL10n.text("測定中…")
         needsDisplay = true
         displayIfNeeded()
     }
@@ -42,7 +42,7 @@ final class UsageSpeedHeaderView: NSView {
         let titleAttrs: [NSAttributedString.Key: Any] = [
             .font: NSFont.systemFont(ofSize: 10, weight: .semibold),
             .foregroundColor: NSColor.secondaryLabelColor]
-        ("  AI CHECKER  /  USAGE" as NSString).draw(
+        (AppL10n.text("  AI CHECKER  /  USAGE") as NSString).draw(
             at: NSPoint(x: 10, y: 8), withAttributes: titleAttrs)
         let font = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
         let attrs: [NSAttributedString.Key: Any] = [.font: font,

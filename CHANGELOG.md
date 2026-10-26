@@ -40,7 +40,7 @@
 
 ## v1.10.1: Select AI providers in menu bar
 
-- Stay-open Display Settings → メニューバーに表示するAI selector. Codex/Claude are independent, with existing profiles unaffected.
+- Stay-open Display Settings → menu-bar AI provider selector. Codex/Claude are independent, with existing profiles unaffected.
 - Opt-in connected official billing reports: GitHub Copilot, OpenAI API, Cursor Team and xAI API; values are monthly billing/requests, not 5h/week chat quota.
 - API-only selection remains accessible; falls back to app launcher icon when no usable report is available.
 - Public source still excludes experimental Claude Web quota access and third-party PNG logos.
@@ -121,3 +121,10 @@
 - Reset/depletion notifications, opt-in API reports and per-provider manual notes retained.
 
 Full historical development records: [docs/legacy/CHANGELOG.md](docs/legacy/CHANGELOG.md).
+
+### Unreleased RC2.3 validation hardening
+
+- Reject JSON boolean values in Codex official App Server quota measurements.
+- Bound Claude Code's sanitized cache read before allocation.
+- Add targeted offline regression tests and isolated native cache smoke.
+- This candidate remains source-only and is not a notarized binary release.

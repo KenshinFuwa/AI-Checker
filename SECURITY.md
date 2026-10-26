@@ -1,28 +1,25 @@
 # Security policy
 
-**Status:** source-only beta; current published main is `v1.9.2-beta.3`, and `v1.10.1` is a proposed update, not yet independently audited.
+**Status:** source-only v1.10.1 RC2.3 candidate. The original RC2.3 source passed eight owner-Mac offline QA gates on 2026-10-25 (Python 115, Swift 114, native release build, Codex mock, Universal 2/temporary DMG). The publication synchronization changes only documentation and checksum records, not the Mac-tested runtime. Exact proposed-commit GitHub CI, live GUI/account validation and safe end-user installation remain outstanding. No general-public Developer ID-signed/notarized application or DMG exists.
 
-Please **do not open public issues containing credentials, cookies, tokens, server addresses, or private account details**. If you suspect a vulnerability, contact the repository maintainer privately using GitHub's private vulnerability reporting (when enabled) or another verified private contact method.
+Please **do not open public issues containing credentials, cookies, tokens, server addresses, or private account details**. To disclose a vulnerability, use GitHub private vulnerability reporting when enabled, or a verified private maintainer contact method. Never post access tokens in public tickets.
 
-This public source archive does not include API keys, auth caches, local app bundles, or provider logo PNGs. The local source build still handles sensitive API administrator keys; use only on devices you trust.
+## Authentication and boundaries
 
-## Authentication & security boundaries
+- Codex usage is read from the official Codex CLI App Server using an isolated profile. The repository does not contain local Codex credentials or account files.
+- The public source disables undocumented Claude Web quota polling. Claude Code's official `statusLine` is the only active Claude quota source, and it may not supply values in every session.
+- Official administrative API reports for optional providers are distinct from consumer chat usage. Administrative API keys must never be committed; local storage uses macOS Keychain.
+- ChatGPT, Gemini, Perplexity, Cursor consumer, and Grok consumer usage are manual notes or provider-site links, not automatically obtained quota telemetry.
+- Missing, expired, or stale observations must not be reported as real remaining quota. The sample percentages shown in offline UI previews are not user measurements.
+- The app does not require Accessibility privileges, synthetic clicks, browser cookie/profile imports, or a background privileged helper for normal functionality.
 
-- Codex uses official CLI App Server with an isolated account directory. This source distribution does not copy your `~/.codex` contents.
-- The public source distribution **does not make Claude Web private/undocumented API calls**. Claude Code statusLine is the only Claude quota source shipped as active. The local experimental build is not identical.
-- Copilot and OpenAI/Cursor Team/xAI official API reports may need high-privilege credentials. API usage reports **are not consumer chat limits**. Keys are stored in the macOS Keychain, and are not shipped with this repo.
-- This is not a password manager. You are responsible for revoking keys at the issuing provider if compromised.
-- ChatGPT, Gemini, Perplexity, Cursor consumer and Grok consumer usage remain **manual notes** and website links; there is no automated quota reader for these.
-- Notifications require macOS permission and cannot deliver while the app is not running. Observations must be fresh; no invented quotas or reset-time-only notifications.
-- No Accessibility permissions, synthetic mouse events, browser profile/cookie database imports, or background helper are required.
+## Source and distribution
 
-## Publishing boundaries
+- The public source excludes official provider logo bitmaps and private experimental integrations; generic bundled artwork is used. Provider marks remain the property of their owners.
+- The repository must not include Keychain contents, authentication caches, API keys, signing private keys, or notary credentials.
+- The installed maintainer's app can differ from this public beta; **never overwrite it with a preview or a test build**.
+- Do not describe temporary unsigned or ad-hoc signed DMGs as trusted or notarized. A general-public installer requires a separate release gate.
 
-- Provider names refer to their respective owners and do not imply endorsement.
-- Official provider logos and other proprietary artwork are deliberately **excluded** from the public repository. The public build uses bundled-source vector fallbacks.
-- Do not publish signed builds from a personal Keychain or your signing-identity files.
-- The project author has confirmed ownership and authorized the MIT copyright notice: **Copyright (c) 2026 Kenshin Fuwa**. This confirmation does not supersede any separate third-party rights.
+## Responsible reporting
 
-## Responsible disclosure
-
-Please share minimal reproduction steps and affected versions without attaching any secrets. Do not post screenshots exposing account identifiers or private URLs.
+Submit a concise reproduction and the affected version without posting sensitive data. See [the source release gate report](RELEASE_GATE.md) and [distribution requirements](docs/DISTRIBUTION.md).

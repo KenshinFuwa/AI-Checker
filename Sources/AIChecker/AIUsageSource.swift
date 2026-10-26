@@ -33,7 +33,11 @@ enum ClaudeStatusLineStore {
 
     static func read(profileID: UUID) -> AIQuotaSnapshot? {
         let target = ClaudeProfileClient.quota(profileID)
-        guard let data = try? Data(contentsOf: target), data.count <= 2048,
+        // Enforce the size limit BEFORE reading. Data(contentsOf:) would load
+        // an attacker-controlled oversized cache into memory first.
+        guard let handle = try? FileHandle(forReadingFrom: target) else { return nil }
+        defer { try? handle.close() }
+        guard let data = try? handle.read(upToCount: 2049), data.count <= 2048,
               let saved = try? JSONDecoder().decode(SanitizedClaudeQuota.self, from: data) else { return nil }
         return saved.snapshot()
     }

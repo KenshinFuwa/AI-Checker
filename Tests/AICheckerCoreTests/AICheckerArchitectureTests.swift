@@ -10,7 +10,7 @@ final class AICheckerArchitectureTests: XCTestCase {
     func testCatalogDedupeAndSourceID() {
         let a = AIProviderDescriptor(id: "example", name: "Example", shortName: "Ex", sourceID: "custom")
         XCTAssertEqual(AIProviderRegistry.ordered([a, a]).count, 1)
-        XCTAssertEqual(AIProviderRegistry.builtins.map(\.sourceID), ["official-codex-app-server", "claude-web-experimental-or-statusline"])
+        XCTAssertEqual(AIProviderRegistry.builtins.map(\.sourceID), ["official-codex-app-server", "claude-first-party-statusline"])
     }
     func testMigratesBothAndCustomizations() {
         var legacy = DisplayPreferences()

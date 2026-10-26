@@ -30,15 +30,20 @@ class PublicSourceContracts(unittest.TestCase):
         self.assertIn('ClaudeStatusLineSource(profileID: profileID)',main)
         self.assertNotIn('Claude専用ブラウザでログイン…',main)
         self.assertIn('return false',main.split('private func claudeWebEnabled(',1)[1].split('private func configureClaudeWebSession()',1)[0])
-    def test_publisher_requires_native_gate_and_public_confirmation(self):
-        script=(ROOT/'scripts/publish-github.sh').read_text()
-        self.assertIn('if [[ "$(uname -s)" != Darwin ]]',script)
-        self.assertIn('gh auth status',script)
-        self.assertIn('gh repo create "$REPOSITORY" --public',script)
-        self.assertIn('Type PUBLISH',script)
-        self.assertIn('python3 scripts/verify-source-manifest.py',script)
-        self.assertIn('git diff --cached --check',script)
-        self.assertIn('users.noreply.github.com',script)
+    def test_historical_publishers_are_disabled_and_fail_closed(self):
+        import subprocess
+        for name in ('publish-github.sh', 'propose-github-beta.sh'):
+            path = ROOT / 'scripts' / name
+            script = path.read_text()
+            self.assertIn('Historical GitHub publication automation is disabled', script)
+            self.assertIn('exit 78', script)
+            self.assertNotIn('gh auth', script)
+            self.assertNotIn('git push', script)
+            self.assertNotIn('gh repo create', script)
+            result = subprocess.run(['bash', str(path)], cwd=str(ROOT),
+                                    text=True, capture_output=True, timeout=5)
+            self.assertEqual(result.returncode, 78, name)
+            self.assertIn('BLOCKED', result.stderr)
 
     def test_public_source_has_no_git_whitespace_errors(self):
         # Catch release-blocking whitespace before cloning/pushing to GitHub.
@@ -80,16 +85,19 @@ class PublicSourceContracts(unittest.TestCase):
 
     def test_docs_do_not_claim_pre_merge_or_old_version(self):
         readme=(ROOT/'README.md').read_text()
-        ja=(ROOT/'docs/README.ja.md').read_text()
         self.assertNotIn('published `main` branch is currently v1.9.2', readme)
         self.assertNotIn('macOS CI has not been confirmed green', readme)
-        self.assertNotIn('v1.9.9-beta.1）。', ja)
         self.assertIn('No Developer ID-signed/notarized', readme)
-        self.assertIn('未公開', ja)
         self.assertIn('checksum', (ROOT/'docs/DISTRIBUTION.md').read_text())
+        self.assertIn('source-only prerelease', (ROOT/'RELEASE_NOTES.md').read_text())
+        self.assertNotIn('still not created', (ROOT/'docs/PUBLISH_PR.md').read_text())
+        self.assertFalse((ROOT/'docs/README.ja.md').exists())
+        self.assertFalse((ROOT/'docs/FREE_PREVIEW.ja.md').exists())
+        for language in ('en','ja'):
+            self.assertTrue((ROOT/f'Localization/{language}.lproj/Localizable.strings').is_file())
 
     def test_docs_and_ci(self):
-        for f in ('README.md','SECURITY.md','LICENSE','PUBLICATION_CHECKLIST.md','docs/README.ja.md','docs/INSTALL.md','.github/workflows/mac-validation.yml'):
+        for f in ('README.md','SECURITY.md','LICENSE','PUBLICATION_CHECKLIST.md','docs/UNNOTARIZED_TEST_PREVIEW.md','docs/INSTALL.md','.github/workflows/mac-validation.yml'):
             self.assertTrue((ROOT/f).is_file(),f)
         self.assertIn('macos-latest',(ROOT/'.github/workflows/mac-validation.yml').read_text())
 if __name__=='__main__':unittest.main(verbosity=2)

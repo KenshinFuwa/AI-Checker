@@ -32,6 +32,13 @@ data = cache.read_text()
 assert 'DO-NOT-STORE' not in data
 assert 'fiveHourRemaining' in data and 'weeklyRemaining' in data
 assert 'session_id' not in data and 'transcript_path' not in data
+# Oversize input MUST fail to ingest, without replacing the previous good cache.
+before = cache.read_bytes()
+oversized = json.dumps(input_data).encode() + b' ' * (256 * 1024 + 2)
+oversize = subprocess.run([binary,'--ingest-claude-statusline','--profile',profile],
+                          input=oversized, capture_output=True, timeout=10)
+assert oversize.returncode == 0, 'Status line must return a printable fallback'
+assert cache.read_bytes() == before, 'Oversized payload modified saved quota'
 # Invalid UUID must fail without touching a real account.
 invalid = subprocess.run([binary,'--ingest-claude-statusline','--profile','not-a-uuid'],
                          input=b'{}', capture_output=True, timeout=10)

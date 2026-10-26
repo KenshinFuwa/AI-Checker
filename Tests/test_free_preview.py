@@ -49,9 +49,9 @@ class FreePreviewContracts(unittest.TestCase):
         self.assertIn('no GitHub Release', script)
 
     def test_docs_explicitly_explain_risks(self):
-        ja = (ROOT / 'docs/FREE_PREVIEW.ja.md').read_text()
-        for marker in ('未公証', '年会費', 'Gatekeeper', '上書きしない', 'UNNOTARIZED_TEST_ONLY'):
-            self.assertIn(marker, ja)
+        guide = (ROOT / 'docs/UNNOTARIZED_TEST_PREVIEW.md').read_text()
+        for marker in ('notarized', 'Developer ID', 'Gatekeeper', 'overwrite', 'UNNOTARIZED_TEST_ONLY'):
+            self.assertIn(marker, guide)
 
     def test_shell_parse(self):
         subprocess.run(['bash', '-n', str(ROOT / 'scripts/build-free-preview-dmg.sh')], check=True)

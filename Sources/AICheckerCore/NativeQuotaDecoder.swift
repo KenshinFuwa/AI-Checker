@@ -1,4 +1,5 @@
 import Foundation
+import CoreFoundation
 
 /// Parses provider-supplied usage telemetry. No cookies, passwords, OAuth tokens,
 /// browser databases, or third-party command-line tools are involved.
@@ -8,7 +9,10 @@ public enum NativeQuotaDecoder {
     }
 
     private static func number(_ value: Any?) -> Double? {
-        guard let number = value as? NSNumber else { return nil }
+        // JSONSerialization bridges `true`/`false` as NSNumber. Never treat
+        // boolean flags as 1% or 0% usage (which could invent a quota).
+        guard let number = value as? NSNumber,
+              CFGetTypeID(number) != CFBooleanGetTypeID() else { return nil }
         let result = number.doubleValue
         return result.isFinite ? result : nil
     }

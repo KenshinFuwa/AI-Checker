@@ -1,49 +1,25 @@
-> Current release gates: [docs/PUBLISH_PR.md](docs/PUBLISH_PR.md) and [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md). The following checklist is historical and may include outdated pre-publication steps.
+# AI Checker — current publication checklist
 
-## v1.9.5-beta.1 feature review (not yet merged)
+This file supersedes the archived first-publication checklist. `KenshinFuwa/AI-Checker` has a recorded initial source publication. Historical publication scripts are disabled and fail closed; GitHub writes require restored access and explicit owner review.
 
-- [x] Original app icon with no third-party logos (PNG + ICNS).
-- [x] User-controlled standard/compact/icon-only status modes; no screen-space inference.
-- [x] System hotkey uses Carbon RegisterEventHotKey, no keyboard events captured.
-- [x] On-demand standalone usage panel and help, first-launch visibility fallback.
-- [ ] Native macOS build + first-run UI + shortcut collision tests on the user Mac.
-- [ ] Pull request reviewed, GitHub macOS CI passes, then merge into `main`.
+## Source-only beta readiness
 
-# Public repository release checklist
+- [x] Project-author MIT license attribution present.
+- [x] Public build disables undocumented Claude Web quota polling and excludes vendor logo bitmaps.
+- [x] Original RC2.2 macOS native QA completed on 2026-10-25: eight PASS gates, 128-file manifest, Python 115 tests, Swift core 111 tests, release build, Codex mock and Universal 2 / disposable DMG layout. The original source ZIP SHA-256 is pinned in RELEASE_GATE.md.
+- [x] This publication synchronization preserves the Mac-tested RC2.3 application Swift code, tests, localization, workflows and build scripts byte-for-byte. The manifest is regenerated for document changes.
+- [x] On 2026-10-26 GitHub account/repository access was verified restored; `main` remains `c237d3fa`.
+- [ ] Owner reviews the final proposed PR diff against current `main`, including README/security, source, permissions, and localization.
+- [x] Original RC2.3 owner-Mac QA: 8/8 PASS; 115 Python / 114 Swift tests, build, Codex mock and Universal 2 checks.
+- [ ] Confirm remote CI passes on the exact publication commit (which contains documentation-only changes relative to the Mac-tested RC2.3 ZIP).
+- [ ] Validate actual native English/Japanese UI, Codex/Claude live data provenance and observed time using a deliberately authorized test profile.
+- [ ] Create an explicitly marked **source-only prerelease**, with source archive checksum and release notes, following owner review.
 
-## Historical initial-publication checklist (repository now public)
+## Public installer requirements (not met)
 
-- [x] **Confirm LICENSE attribution/rights.** Project author confirmed sole copyright ownership and authorized the MIT notice **Copyright (c) 2026 Kenshin Fuwa** on 2026-10-20. Check any subsequently imported third-party code separately.
-- [x] **Disable undocumented Claude Web quota polling in public source**. Current Anthropic Consumer Terms restrict automated access unless expressly permitted. The local experimental build is not published unchanged.
-- [ ] **Run `./scripts/check.sh` on an actual Mac** and save the stdout/exit code. Linux parser/core tests do not establish AppKit runtime correctness.
-- [ ] **Inspect `git diff --cached` and `git status`** before first push; avoid personal paths, screenshot metadata, secrets, `.build/`, Keychain content, logs, signing identities and local archives.
-- [x] **Choose the GitHub repository visibility** (`public`) and owner/name (`KenshinFuwa/AI-Checker`). The guarded publish script refuses existing repositories and requires explicit confirmation.
+- [ ] Apple Developer ID Application signature with hardened runtime and timestamp.
+- [ ] Apple notarization accepted and stapled; verify actual signed binary and DMG.
+- [ ] Clean-machine tests on Apple Silicon and Intel, including Gatekeeper, login item, Keychain migration, notifications, and app behavior.
+- [ ] Ensure downloads and installation instructions refer only to verified release assets.
 
-## Strongly recommended before downloadable binary releases
-
-- [ ] Developer ID + hardened runtime + Apple notarization + stapling, with clean Mac testing.
-- [ ] Confirm third-party mark usage in promotional screenshots/artwork. This source package intentionally excludes provider PNGs.
-- [ ] Review provider data semantics, throttling, caching and error states using test accounts.
-- [ ] Validate first-launch, login-item approval, logout, notification permissions and upgrade from a separately signed build.
-- [ ] Tag source beta version and enable GitHub Actions on macOS.
-- [ ] Configure GitHub private vulnerability reporting and repository branch protection.
-
-## First publication on macOS
-
-Once the repository archive has been extracted, run:
-
-```bash
-bash scripts/publish-github.sh
-```
-
-The script verifies the active GitHub login is `KenshinFuwa`, checks that
-`KenshinFuwa/AI-Checker` does not exist, performs the full macOS native
-validation and source-manifest verification, stages only permitted source
-files, previews the staged changes, and requires typing `PUBLISH` before
-creating **a new public** repository. It commits and pushes only source and a
-beta tag. It will never modify an already existing remote repository or local
-installed app. The official GitHub CLI must be installed and authenticated.
-
-The public source intentionally differs from the author's locally installed
-v1.9.2: Claude's undocumented Web quota-fetching implementation is not
-included. Claude Code statusLine remains available when it reports quotas.
+Read [RELEASE_GATE.md](RELEASE_GATE.md), [docs/PUBLISH_PR.md](docs/PUBLISH_PR.md) and [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) before any release.

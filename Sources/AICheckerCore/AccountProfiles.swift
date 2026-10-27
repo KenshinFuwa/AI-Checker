@@ -1,4 +1,5 @@
 import Foundation
+import CoreFoundation
 
 /// Descriptors have no credentials. Codex owns CODEX_HOME; Claude Code owns CLAUDE_CONFIG_DIR.
 public struct AICheckerAccount: Codable, Equatable, Identifiable, Sendable {
@@ -101,7 +102,10 @@ public struct AccountConfiguration: Codable, Equatable, Sendable {
 /// The app server returns the complete server-side snapshot. Never assume primary == five hours.
 public enum CodexAppServerQuotaDecoder {
     private static func numeric(_ value: Any?) -> Double? {
-        guard let value = value as? NSNumber else { return nil }
+        // JSONSerialization bridges JSON booleans to NSNumber. A boolean is
+        // not a percentage, reset timestamp or duration (even if it is 0/1).
+        guard let value = value as? NSNumber,
+              CFGetTypeID(value) != CFBooleanGetTypeID() else { return nil }
         let result = value.doubleValue
         return result.isFinite ? result : nil
     }

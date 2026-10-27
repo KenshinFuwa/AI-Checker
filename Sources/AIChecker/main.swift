@@ -579,17 +579,17 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             card.view = UsageDashboardMenuView(provider: provider, snapshot: snap, failure: failure)
             menu.addItem(card)
 
-            let details = NSMenuItem(title: "  \(provider.name) の詳細", action: nil, keyEquivalent: "")
-            let detailsMenu = NSMenu(title: "\(provider.name) の詳細")
-            detailsMenu.addItem(withTitle: "5h残量: \(percent(snap?.fiveHour.remainingPercent))", action: nil, keyEquivalent: "")
-            detailsMenu.addItem(withTitle: "週残量: \(percent(snap?.weekly.remainingPercent))", action: nil, keyEquivalent: "")
+            let details = NSMenuItem(title: "  " + AppL10n.format("%@ Details", provider.name), action: nil, keyEquivalent: "")
+            let detailsMenu = NSMenu(title: AppL10n.format("%@ Details", provider.name))
+            detailsMenu.addItem(withTitle: AppL10n.format("5h残量: %@", percent(snap?.fiveHour.remainingPercent)), action: nil, keyEquivalent: "")
+            detailsMenu.addItem(withTitle: AppL10n.format("週残量: %@", percent(snap?.weekly.remainingPercent)), action: nil, keyEquivalent: "")
             detailsMenu.addItem(.separator())
-            detailsMenu.addItem(withTitle: "5h更新: \(dateText(snap?.fiveHour.resetsAt))", action: nil, keyEquivalent: "")
-            detailsMenu.addItem(withTitle: "週更新: \(dateText(snap?.weekly.resetsAt))", action: nil, keyEquivalent: "")
-            detailsMenu.addItem(withTitle: "記録時刻: \(dateText(snap?.updatedAt))", action: nil, keyEquivalent: "")
-            detailsMenu.addItem(withTitle: "情報源: \(snap?.source ?? "未取得")", action: nil, keyEquivalent: "")
+            detailsMenu.addItem(withTitle: AppL10n.format("5h更新: %@", dateText(snap?.fiveHour.resetsAt)), action: nil, keyEquivalent: "")
+            detailsMenu.addItem(withTitle: AppL10n.format("週更新: %@", dateText(snap?.weekly.resetsAt)), action: nil, keyEquivalent: "")
+            detailsMenu.addItem(withTitle: AppL10n.format("記録時刻: %@", dateText(snap?.updatedAt)), action: nil, keyEquivalent: "")
+            detailsMenu.addItem(withTitle: AppL10n.format("情報源: %@", snap?.source ?? AppL10n.text("未取得")), action: nil, keyEquivalent: "")
             if let state = providerHealth.states[provider.id] {
-                detailsMenu.addItem(withTitle: "状態: \(state.lastFailure?.displayMessage ?? (state.auth == .connected ? "接続済み" : "取得状態未確認"))", action: nil, keyEquivalent: "")
+                detailsMenu.addItem(withTitle: AppL10n.format("状態: %@", state.lastFailure?.displayMessage ?? (state.auth == .connected ? AppL10n.text("接続済み") : AppL10n.text("取得状態未確認"))), action: nil, keyEquivalent: "")
             }
             details.submenu = detailsMenu
             MenuVisualStyle.adorn(details, symbol: "chart.bar.xaxis")
@@ -599,9 +599,9 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             let currentMonth = Calendar(identifier: .gregorian).dateComponents(in: TimeZone(secondsFromGMT: 0)!, from: Date())
             if report.year == currentMonth.year && report.month == currentMonth.month {
                 menu.addItem(.separator())
-                menu.addItem(withTitle: "GitHub Copilot（当月のPremium Requests使用量）", action: nil, keyEquivalent: "")
-                menu.addItem(withTitle: "    使用数: \(String(format: "%.1f", report.grossRequests)) 件（上限・残量率は未取得）", action: nil, keyEquivalent: "")
-                menu.addItem(withTitle: "    更新: \(dateText(report.observedAt)) / 個人向け請求レポート", action: nil, keyEquivalent: "")
+                menu.addItem(withTitle: AppL10n.text("GitHub Copilot（当月のPremium Requests使用量）"), action: nil, keyEquivalent: "")
+                menu.addItem(withTitle: AppL10n.format("    使用数: %@ 件（上限・残量率は未取得）", String(format: "%.1f", report.grossRequests)), action: nil, keyEquivalent: "")
+                menu.addItem(withTitle: AppL10n.format("    更新: %@ / 個人向け請求レポート", dateText(report.observedAt)), action: nil, keyEquivalent: "")
             }
         }
         let currentPeriod = ExternalAPIUsage.startOfUTCMonth(Date())
@@ -621,16 +621,16 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
                     let formatted = report.unit == "USD"
                         ? String(format: "$%.2f", report.value)
                         : String(format: "%.0f requests", report.value)
-                    item = "\(kind.name): \(formatted)（\(report.label)・当月）"
+                    item = AppL10n.format("%@: %@（%@・当月）", kind.name, formatted, report.label)
                 } else {
-                    item = "\(kind.name): 未取得 / 古いデータ"
+                    item = AppL10n.format("%@: 未取得 / 古いデータ", kind.name)
                 }
                 menu.addItem(withTitle: item, action: nil, keyEquivalent: "")
                 if !current { menu.addItem(withTitle: "    \(state)", action: nil, keyEquivalent: "") }
             }
         }
         if copilotAccessMode.permitsPersonalBillingAPI && copilotClient.configured {
-            menu.addItem(withTitle: "    GitHub状態: \(copilotState)", action: nil, keyEquivalent: "")
+            menu.addItem(withTitle: AppL10n.format("    GitHub状態: %@", copilotState), action: nil, keyEquivalent: "")
         }
         if !consumerNotes.isEmpty {
             menu.addItem(.separator())
@@ -638,7 +638,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             for site in ConsumerWebAccess.destinations {
                 guard let note = consumerNotes[site.id] else { continue }
                 let age = note.isRecent() ? "1時間以内" : "古い記録"
-                menu.addItem(withTitle: "  \(site.name): \(note.text) ［\(age)・手動］",
+                menu.addItem(withTitle: AppL10n.format("  %@: %@ ［%@・手動］", site.name, note.text, AppL10n.text(age)),
                              action: nil, keyEquivalent: "")
             }
         }
@@ -682,12 +682,12 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             }
         }
         if let error = loginRegistrationError {
-            menu.addItem(withTitle: "ログイン項目: \(error)", action: nil, keyEquivalent: "")
+            menu.addItem(withTitle: AppL10n.format("ログイン項目: %@", error), action: nil, keyEquivalent: "")
         }
         menu.addItem(.separator())
         menu.addItem(MenuVisualStyle.heading("SYNC  /  更新"))
-        menu.addItem(withTitle: "最終同期: \(dateText(lastSuccess))\(isStale ? "（古い／未取得）" : "")", action: nil, keyEquivalent: "")
-        if let error = lastError { menu.addItem(withTitle: "取得エラー: \(error)", action: nil, keyEquivalent: "") }
+        menu.addItem(withTitle: AppL10n.format("最終同期: %@%@", dateText(lastSuccess), isStale ? AppL10n.text("（古い／未取得）") : ""), action: nil, keyEquivalent: "")
+        if let error = lastError { menu.addItem(withTitle: AppL10n.format("取得エラー: %@", error), action: nil, keyEquivalent: "") }
         if !demo {
             addStayOpenRow("今すぐ更新", to: menu,
                 enabledWhen: { [weak self] in
@@ -1957,7 +1957,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
 
     private func percent(_ pct: Double?) -> String { pct.map { "\(Int($0.rounded()))%" } ?? "—" }
     private func dateText(_ date: Date?) -> String {
-        guard let date = date else { return "不明" }
+        guard let date = date else { return AppL10n.text("不明") }
         return DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
     }
 }
@@ -1974,7 +1974,9 @@ if CommandLine.arguments.contains("--ingest-claude-statusline") {
         print("Claude · プロフィールの再設定が必要")
         exit(2)
     }
-    let data = FileHandle.standardInput.readDataToEndOfFile()
+    // The statusLine input can contain arbitrary session metadata. Limit the
+    // read BEFORE parsing to avoid unbounded memory consumption.
+    let data = FileHandle.standardInput.readData(ofLength: 256 * 1024 + 1)
     if ClaudeStatusLineStore.importStatusLine(data, profileID: profileID),
        let snap = ClaudeStatusLineStore.read(profileID: profileID) {
         let five = snap.fiveHour.remainingPercent.map { "\(Int($0.rounded()))%" } ?? "—"
@@ -2098,6 +2100,15 @@ if CommandLine.arguments.contains("--ingest-claude-statusline") {
         } catch {
             throw error
         }
+        // The cache reader must ignore an oversized file without parsing it,
+        // and without reading outside this newly generated test profile.
+        let cache = ClaudeProfileClient.quota(account.id)
+        try Data(repeating: 65, count: 4096).write(to: cache, options: .atomic)
+        guard ClaudeStatusLineStore.read(profileID: account.id) == nil else {
+            throw SelfTestError.unexpected
+        }
+        try FileManager.default.removeItem(at: cache)
+        print("PASS: isolated Claude cache over-limit guard")
         print("PASS: isolated Claude profile, idempotence, custom-settings non-overwrite")
     } catch {
         fputs("FAIL: Claude profile selftest: \(error)\n", stderr)

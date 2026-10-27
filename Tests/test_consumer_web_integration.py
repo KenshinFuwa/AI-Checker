@@ -54,9 +54,10 @@ class ConsumerWebTests(unittest.TestCase):
 
     def test_version_and_docs_explicit(self):
         self.assertIn('<string>1.10.1</string>',(ROOT/'scripts/install-local.sh').read_text())
-        for fn in ['docs/legacy/README_FIRST.md','docs/legacy/README_JA.md']:
-            t=(ROOT/fn).read_text()
-            self.assertIn('AI-Checker-v1.9.2.zip',t)
-            self.assertIn('自動取得',t)
+        guide = (ROOT / 'README.md').read_text()
+        security = (ROOT / 'SECURITY.md').read_text()
+        self.assertIn('manual notes', guide)
+        self.assertIn('manual notes', security)
+        self.assertIn('not automatically obtained quota telemetry', security)
 
 if __name__ == '__main__': unittest.main(verbosity=2)

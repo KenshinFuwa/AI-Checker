@@ -33,7 +33,11 @@ class LocalizationContracts(unittest.TestCase):
         self.assertGreaterEqual(len(english), 100)
         self.assertEqual(set(english), set(japanese))
         for key, value in english.items():
-            self.assertEqual(japanese[key], key)
+            if key in {'RESETS IN', '5 hours', 'Week', 'Unknown', 'Awaiting update', '  AI CHECKER  /  USAGE', '%@ Details',
+                       '5h残量: %@', '週残量: %@', '5h更新: %@', '週更新: %@'}:
+                self.assertTrue(japanese[key])
+            else:
+                self.assertEqual(japanese[key], key)
             self.assertFalse(JAPANESE.search(value), f'English translation missing: {key}')
             self.assertNotEqual(value, '', f'empty translation: {key}')
         for key in ('今すぐ更新', 'ChatGPTでかんたん接続…',

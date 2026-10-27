@@ -1,10 +1,20 @@
-# Updating the existing public GitHub repository
+# Publishing an update to an existing GitHub repository
 
-`KenshinFuwa/AI-Checker` already exists and its current published `main` is at initial source beta `v1.9.2-beta.3`. **Never rerun `scripts/publish-github.sh`** (that script attempts initial repository creation). The local private AI Checker app must remain unchanged.
+Repository: `KenshinFuwa/AI-Checker`. This is an **existing** repository. Both historical GitHub publishing scripts (`scripts/publish-github.sh` and `scripts/propose-github-beta.sh`) are intentionally **disabled** and exit nonzero without network or GitHub writes. Do not re-enable or bypass them during account review. Future publishing requires owner-reviewed changes and explicit manual Git operations after access is restored.
 
-1. On your Mac, unpack this public candidate in a **new folder**; do not install it over the existing app.
-2. Run `bash scripts/propose-github-beta.sh`. It verifies the SHA-256 source manifest, runs macOS native checks, opens a temporary clone, stages source-only files, shows the diff and waits for explicit `PROPOSE` before pushing an isolated branch and opening a PR.
-3. Verify the PR file diff, CI logs and license/privacy content. **Do not merge until macOS CI actually passes**. The first published workflow runs were cancelled before any test steps, so they are not evidence of passing. The portable Linux gate deliberately excludes the Codex RPC mock; that integration is verified in the native macOS gate.
-4. Merge manually on GitHub after review, then decide on a new source-only tag. Do not publish a binary until the steps in [DISTRIBUTION.md](DISTRIBUTION.md) are completed.
+## Before repository access is restored
 
-The separate local build retains private experimental Claude Web functionality; the public candidate deliberately disables it. A successful source-build does **not** establish identical function or telemetry on both versions.
+- Develop and test locally; keep the owner's working `/Applications/AI Checker.app`, login sessions, settings and Keychain untouched.
+- Do not issue GitHub write actions, retry failed authentication in a loop, create replacement accounts to evade enforcement, or re-upload software to an alternate account to bypass a restriction.
+- Keep the exact source archive and QA evidence; see [RELEASE_GATE.md](../RELEASE_GATE.md).
+
+## After the owner independently confirms account restoration
+
+1. Inspect the actual remote default branch, latest commit, tags, existing releases, and ongoing CI. The last historically recorded source merge is `c237d3fa74733414775a2808542508efd995783b`; **do not assume this is still HEAD**.
+2. Review a **local candidate diff** against that remote branch. Inspect changes to source, test expectations, localization resources, security documentation, workflows and LICENSE. If other changes have landed, reconcile them rather than overwriting remote work.
+3. Run the native source checks on the candidate (`python3 scripts/verify-source-manifest.py`, `bash scripts/check.sh`), and preserve the complete logs. Do not install the app to perform this gate.
+4. Create a feature branch from the inspected remote base and open a pull request. Never push directly to `main` and never rewrite existing tags/releases. Verify no credentials or private files are staged.
+5. Review the PR diff and successful GitHub Actions on the **exact commit** to be merged. Obtain the owner's explicit approval before merging or publishing.
+6. For the initial documentation-corrected RC2 candidate, prefer a clearly identified **source-only prerelease** and attach its SHA-256. Never upload the temporary unsigned/adhoc DMG from CI as a general-use installer.
+
+Developer ID-signing and notarization remain a separate, stricter release track: see [DISTRIBUTION.md](DISTRIBUTION.md).

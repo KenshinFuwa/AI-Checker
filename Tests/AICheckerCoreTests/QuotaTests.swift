@@ -77,6 +77,33 @@ final class QuotaTests: XCTestCase {
         XCTAssertNil(snapshot?.weekly.remainingPercent)
     }
 
+    func testClaudeRejectsBooleanUsageInsteadOfCallingItOnePercent() {
+        let payload = Data(#"{"rate_limits":{"five_hour":{"used_percentage":true,"resets_at":1800001000}}}"#.utf8)
+        XCTAssertNil(NativeQuotaDecoder.claudeStatusLine(payload, now: now))
+    }
+
+    func testClaudeRejectsBooleanResetTimestamp() throws {
+        let payload = Data(#"{"rate_limits":{"five_hour":{"used_percentage":25,"resets_at":true}}}"#.utf8)
+        let parsed = try XCTUnwrap(NativeQuotaDecoder.claudeStatusLine(payload, now: now))
+        XCTAssertEqual(parsed.fiveHour.remainingPercent, 75)
+        XCTAssertNil(parsed.fiveHour.resetsAt)
+    }
+
+    func testClaudePartialRateLimitAndSpendOnlyRemainUnknown() throws {
+        let partial = Data(#"{"rate_limits":{"seven_day":{"used_percentage":63,"resets_at":1800002000}}}"#.utf8)
+        let snapshot = try XCTUnwrap(NativeQuotaDecoder.claudeStatusLine(partial, now: now))
+        XCTAssertNil(snapshot.fiveHour.remainingPercent)
+        XCTAssertEqual(snapshot.weekly.remainingPercent, 37)
+        let spendOnly = Data(#"{"rate_limits":{"spend_limit":{"used_percentage":62.8}}}"#.utf8)
+        XCTAssertNil(NativeQuotaDecoder.claudeStatusLine(spendOnly, now: now))
+    }
+
+    func testCacheRejectsInvalidStoredPercentage() throws {
+        let corrupted = #"{"schema":1,"capturedAt":1800000000,"fiveHourRemaining":101,"weeklyRemaining":-4,"fiveHourReset":1800002000,"weeklyReset":1800003000}"#
+        let saved = try JSONDecoder().decode(SanitizedClaudeQuota.self, from: Data(corrupted.utf8))
+        XCTAssertNil(saved.snapshot(now: now))
+    }
+
     func testExpiredCachedSampleNeverGuessesNewReset() throws {
         let data = Data(#"{"rate_limits":{"five_hour":{"used_percentage":28,"resets_at":1800001000}}}"#.utf8)
         let snapshot = try XCTUnwrap(NativeQuotaDecoder.claudeStatusLine(data, now: now))

@@ -1,31 +1,31 @@
-# AI Checker public-source audit — 2026-10-20
+# AI Checker — release-candidate audit (updated 2026-10-26)
 
-## Evidence from this preparation pass (v1.9.2-beta.3)
+## Pinned evidence
 
-- Base: locally supplied `AI-Checker-v1.9.2.zip` (original release retained separately by the user).
-- Scope: repository-source preparation; public build excludes binary provider logos; app quota business logic unchanged.
-- Automated Linux validation: `bash scripts/check.sh` **exit 0**.
-- Swift core tests: **103/103 PASS**.
-- Python suites: **47/47 PASS** (7 public release + 22 release invariants + 5 consumer + 4 quota notifications + 6 sizing/preview + 3 installer). Counts can be verified from the full log or by rerunning; do not treat them as macOS system integration tests.
-- Codex mocked App Server integration: **PASS**.
-- Swift AppKit source *parser* on Linux: PASS; native typecheck/build on macOS: **not performed for the modified public-source distribution**.
-- Source privacy pattern scan: PASS for tested patterns, not a formal secrets audit.
-- No vendor PNG files, no built binaries, no signing certificates, and no auth exports are included in the public ZIP.
+A source archive named `AI-Checker-v1.10.1-localization-rc1-source.zip` was verified on the owner's Mac. Its independent QA result archive `AI_CHECKER_RC1_QA_RESULT_AI_CHECKER_RC1_QA_20261025_021829_6yR3aF.zip` reports seven PASS statuses and zero failures:
 
-## Open gates before public GitHub visibility
+| Gate | Observed result |
+| --- | --- |
+| Source archive CRC and pinned hash | PASS |
+| SHA-256 manifest, 131 source files | PASS |
+| Python regression | PASS (115 tests) |
+| Swift core | PASS (107 tests) |
+| Native release build | PASS |
+| Codex App Server mock | PASS |
+| Universal 2 builds / disposable DMG layout audit | PASS (arm64 + x86_64) |
 
-1. **CLEARED by author declaration (2026-10-20):** rights holder confirmed sole authorship/ownership and authorized the MIT notice `Copyright (c) 2026 Kenshin Fuwa`. Any third-party work added later must be checked separately.
-2. Disable non-public Claude Web quota integration in public source and document behavior differences (addressed in beta.3). The public source now disables undocumented Claude Web polling; official Claude Code statusLine is retained.
-3. Check on an actual Mac: `./scripts/check.sh`, Codex/Claude login, notification test, cascading menus, live resizing and Keychain behavior.
-4. Make a deliberate visibility choice, review the staged diff and remote repository, and only then push publicly.
-5. Developer ID signing and notarization must be addressed **before distributing a general-use macOS binary** (source-only beta does not include one).
+This is evidence about **RC1**, not an assertion that a documentation-modified candidate or a clean user installation was tested on a Mac. Runtime Swift files in this documentation candidate are unchanged; native build and repository CI must still be rechecked on its exact commit.
 
-## Publication status
+## Unverified or blocked
 
-**SOURCE PACKAGE VALIDATED ON LINUX; GITHUB NOT YET PUBLISHED.** Copyright attribution has been updated with author permission. The optional Claude integration terms and native macOS test remain open review gates; no GitHub repository was created or modified during this audit.
+- Actual authenticated Codex/Claude quotas and statusLine freshness, native interactive Japanese/English appearance, account recovery, notifications and safe upgrade from locally signed installations.
+- No Developer ID public binary signature, accepted Apple notarization, stapling or end-user clean installation.
+- GitHub access was independently verified restored on 2026-10-26. The public default branch is `main`, at `c237d3fa74733414775a2808542508efd995783b` with a historical successful workflow; no open pull requests or releases were returned. The new RC2.3 commit and its CI are still pending.
 
-## beta.3 publication guard
+## Safety
 
-- Current consumer terms: https://www.anthropic.com/legal/consumer-terms (section 3). Public build disables non-public Claude Web calls; the local private version is untouched.
-- `scripts/publish-github.sh` checks macOS native build, active owner identity, empty target repo, staged paths, source hashes and explicit confirmation; publishes *source only*.
-- GitHub repo is still not created at package time; publisher must run the script on the Mac. CI success cannot be asserted until GitHub Actions run.
+Do not publish private authentication stores, local experimental features, vendor logos, or a temporary unsigned DMG. Do not execute the historical initial-publication script. See [the release gate](RELEASE_GATE.md) and [the owner-reviewed publication instructions](docs/PUBLISH_PR.md).
+
+## RC2.3 current Mac evidence
+
+The owner-Mac RC2.3 QA report `AI_CHECKER_RC23_QA_RESULT_AI_CHECKER_RC23_QA_axdn0evb.zip` records eight gates with exit code zero, including 115 Python and 114 Swift core tests, native release build, isolated Codex mock, and Universal 2/temporary DMG checks. The tested source ZIP SHA-256 is `c3f2ce23e1cfb0d499a200dd9f24c80a6565c6c5392f5218b700865cbe386e4c`. Documentation-only changes prepared after this QA are **not** the same ZIP; runtime-source parity is maintained separately, and GitHub CI must pass on the exact proposed commit.

@@ -53,7 +53,7 @@ public struct ProviderMeter: Equatable, Sendable {
 public enum AIProviderRegistry {
     public static let builtins: [AIProviderDescriptor] = [
         AIProviderDescriptor(id: "codex", name: "Codex", shortName: "Co", sourceID: "official-codex-app-server"),
-        AIProviderDescriptor(id: "claude", name: "Claude", shortName: "Cl", sourceID: "claude-web-experimental-or-statusline")
+        AIProviderDescriptor(id: "claude", name: "Claude", shortName: "Cl", sourceID: "claude-first-party-statusline")
     ]
 
     /// Catalog-only entries do not have an authorized quota reader. They are

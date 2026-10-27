@@ -34,6 +34,35 @@ final class AccountProfileTests: XCTestCase {
         XCTAssertNil(CodexAppServerQuotaDecoder.decodeResult(["rateLimitsByLimitId": ["other": ["primary": window(1, 300, 2_000_010_000)]], "rateLimits": valid["rateLimits"]!], now: now))
         XCTAssertNil(CodexAppServerQuotaDecoder.decodeResult(["rateLimits": ["primary": window(10, 300, 1_999_999_999)]], now: now))
     }
+    func testAppServerBooleanUsedPercentageIsUnknown() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        for value in [true, false] {
+            let result: [String: Any] = ["rateLimitsByLimitId": ["codex": [
+                "primary": ["usedPercent": value, "windowDurationMins": 300, "resetsAt": 2_000_010_000]
+            ]]]
+            XCTAssertNil(CodexAppServerQuotaDecoder.decodeResult(result, now: now),
+                         "JSON boolean must never become an inferred 99% or 100% quota")
+        }
+    }
+    func testAppServerRejectsBooleanResetTimeAndPreservesValidWeeklyData() {
+        // If `true` were accepted as Unix timestamp 1, it would appear future
+        // relative to the epoch. A good weekly window must still survive.
+        let epoch = Date(timeIntervalSince1970: 0)
+        let result: [String: Any] = ["rateLimitsByLimitId": ["codex": [
+            "primary": ["usedPercent": 20, "windowDurationMins": 300, "resetsAt": true],
+            "secondary": ["usedPercent": 25, "windowDurationMins": 10080, "resetsAt": 3_600]
+        ]]]
+        let parsed = CodexAppServerQuotaDecoder.decodeResult(result, now: epoch)
+        XCTAssertNil(parsed?.fiveHour.remainingPercent)
+        XCTAssertEqual(parsed?.weekly.remainingPercent, 75)
+    }
+    func testAppServerNumericZeroIsValid() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        let result: [String: Any] = ["rateLimits": ["limitId": "codex", "primary": [
+            "usedPercent": 0, "windowDurationMins": 300, "resetsAt": 2_000_010_000
+        ]]]
+        XCTAssertEqual(CodexAppServerQuotaDecoder.decodeResult(result, now: now)?.fiveHour.remainingPercent, 100)
+    }
     func testWeeklyOnlyNeverInventsFiveHours() {
         let now = Date(timeIntervalSince1970: 2_000_000_000)
         let result: [String: Any] = ["rateLimitsByLimitId": ["codex": ["secondary": ["usedPercent": 67, "windowDurationMins": 10080, "resetsAt": 2_000_050_000]]]]

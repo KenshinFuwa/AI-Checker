@@ -233,3 +233,35 @@
 "利用制限が返されませんでした（前回値は期限付き保持）" = "No usage limits returned (previous reading temporarily retained).";
 "利用制限を取得できません。次回再試行します。" = "Could not fetch usage limits. Will retry later.";
 "例: Proモデル 残り28%、リセット 18:00" = "Example: Pro model 28% remaining; resets at 18:00";
+
+/* Native usage menu (V4 localization port, production safe) */
+"%@ Details" = "%@ Details";
+"5h残量: %@" = "5h Remaining: %@";
+"週残量: %@" = "Weekly Remaining: %@";
+"5h更新: %@" = "5h Resets: %@";
+"週更新: %@" = "Week Resets: %@";
+"記録時刻: %@" = "Observed: %@";
+"情報源: %@" = "Source: %@";
+"状態: %@" = "Status: %@";
+"取得状態未確認" = "Not Yet Verified";
+"接続済み" = "Connected";
+"GitHub Copilot（当月のPremium Requests使用量）" = "GitHub Copilot (Monthly Premium Requests)";
+"    使用数: %@ 件（上限・残量率は未取得）" = "    Requests Used: %@ (limit and remaining quota unavailable)";
+"    更新: %@ / 個人向け請求レポート" = "    Updated: %@ / Personal Billing Report";
+"%@: %@（%@・当月）" = "%@: %@ (%@, current month)";
+"%@: 未取得 / 古いデータ" = "%@: unavailable / stale data";
+"    GitHub状態: %@" = "    GitHub Status: %@";
+"  %@: %@ ［%@・手動］" = "  %@: %@ [%@, manual]";
+"1時間以内" = "Within the Past Hour";
+"古い記録" = "Older Record";
+"ログイン項目: %@" = "Login Item: %@";
+"最終同期: %@%@" = "Last Sync: %@%@";
+"（古い／未取得）" = " (stale/unavailable)";
+"取得エラー: %@" = "Fetch Error: %@";
+"RESETS IN" = "RESETS IN";
+"5 hours" = "5 Hours";
+"Week" = "Week";
+"Unknown" = "Unknown";
+"Awaiting update" = "Awaiting Update";
+"測定中…" = "Measuring…";
+"  AI CHECKER  /  USAGE" = "  AI CHECKER  /  USAGE";

@@ -48,7 +48,7 @@ final class UsageDashboardMenuView: NSView {
 
         // Right edge is EXACTLY the same as every countdown beneath this
         // heading; never give the caption an unrelated hard-coded x origin.
-        writeRightAligned(UsageMenuPresentation.resetCaption,
+        writeRightAligned(AppL10n.text(UsageMenuPresentation.resetCaption),
                           rightX: CGFloat(UsageMenuPresentation.resetCaptionRightX),
                           centerY: headerY,
                           font: .systemFont(ofSize: 9, weight: .semibold),
@@ -62,12 +62,12 @@ final class UsageDashboardMenuView: NSView {
         NSColor.separatorColor.withAlphaComponent(0.33).setStroke()
         divider.stroke()
 
-        metric(label: UsageMenuPresentation.rowLabels[0],
+        metric(label: AppL10n.text(UsageMenuPresentation.rowLabels[0]),
                percent: snapshot?.fiveHour.remainingPercent,
                resetAt: snapshot?.fiveHour.resetsAt,
                centerY: CGFloat(UsageMenuPresentation.fiveHourRowCenterY),
                now: now, fresh: fresh)
-        metric(label: UsageMenuPresentation.rowLabels[1],
+        metric(label: AppL10n.text(UsageMenuPresentation.rowLabels[1]),
                percent: snapshot?.weekly.remainingPercent,
                resetAt: snapshot?.weekly.resetsAt,
                centerY: CGFloat(UsageMenuPresentation.weekRowCenterY),
@@ -99,7 +99,31 @@ final class UsageDashboardMenuView: NSView {
                       color: accent ?? .secondaryLabelColor)
 
         let countdown = ResetCountdown.format(until: resetAt, now: now, fresh: fresh)
-        writeCountdown(countdown, centerY: centerY)
+        writeCountdown(localizedCountdown(countdown), centerY: centerY)
+    }
+
+    /// Keep the validated core countdown math; adapt only its visual units.
+    private func localizedCountdown(_ english: String) -> String {
+        guard Bundle.main.preferredLocalizations.first == "ja" else {
+            return AppL10n.text(english)
+        }
+        let words = english.split(separator: " ")
+        guard words.count > 0, words.count.isMultiple(of: 2) else {
+            return AppL10n.text(english)
+        }
+        var result = ""
+        for index in stride(from: 0, to: words.count, by: 2) {
+            guard let quantity = Int(words[index]) else { return AppL10n.text(english) }
+            let suffix: String
+            switch words[index + 1] {
+            case "day", "days": suffix = "日"
+            case "hour", "hours": suffix = "時間"
+            case "minute", "minutes": suffix = "分"
+            default: return AppL10n.text(english)
+            }
+            result += "\(quantity)\(suffix)"
+        }
+        return result
     }
 
     private func writeCountdown(_ value: String, centerY: CGFloat) {

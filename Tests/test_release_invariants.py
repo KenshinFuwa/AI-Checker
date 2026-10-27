@@ -302,7 +302,7 @@ class ReleaseInvariants(unittest.TestCase):
         self.assertIn('rowLabels[1]', view)
         self.assertIn('ResetsAt', view.replace('resetsAt','ResetsAt'))
         self.assertIn('meterWidth', view)
-        self.assertIn('writeCountdown(countdown', view)
+        self.assertIn('writeCountdown(localizedCountdown(countdown)', view)
         self.assertNotIn('drawCountdown("5h ·', view)
 
     def test_dashboard_alignment_uses_shared_guides_not_magic_offsets(self):

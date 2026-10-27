@@ -1,4 +1,4 @@
-> **Release candidate status (2026-10-26 JST):** GitHub access is restored and the public `main` branch remains at `c237d3fa74733414775a2808542508efd995783b`. The isolated **RC2.3 owner-Mac QA passed 8/8** on 2026-10-25 (Python 115 tests, Swift 114 tests, native release build, Codex mock and Universal 2/temporary-DMG checks); the tested source ZIP SHA-256 is `c3f2ce23e1cfb0d499a200dd9f24c80a6565c6c5392f5218b700865cbe386e4c`. This documentation-only publication synchronization does **not** change that tested application code. It is **not yet merged or released**: owner-reviewed pull request, CI for its exact commit, and live GUI/account validation remain outstanding. No Developer ID-signed/notarized public installer exists. See [release gate](RELEASE_GATE.md).
+> **Published source beta (2026-10-27):** [AI Checker v1.10.1-beta.1](https://github.com/KenshinFuwa/AI-Checker/releases/tag/v1.10.1-beta.1) is available as a **source-only GitHub pre-release**. Tag and `main` were verified at commit `9c371da7b4a362ec517e4b9a9b514eda915def48`; its GitHub Actions checks passed 4/4. No Developer ID-signed/notarized end-user installer is included. The original RC2.3 owner-Mac offline QA passed 8/8; that separately tested ZIP is not byte-identical to GitHub-generated source archives. See [release gate](RELEASE_GATE.md).
 
 # AI Checker
 
@@ -85,7 +85,7 @@ The local/private v1.9.2 app and this source-only public beta are **not feature-
 
 ## Feature preview / contributing
 
-The source code is already public at `KenshinFuwa/AI-Checker`. The historical GitHub publication scripts are disabled and fail closed; do not bypass these guards. For future changes, follow [the guarded publication guide](docs/PUBLISH_PR.md); do not run initial-publication scripts or push while repository access is restricted. A PR and source release still require an owner-reviewed remote diff and GitHub CI.
+The source code and the [source-only beta pre-release](https://github.com/KenshinFuwa/AI-Checker/releases/tag/v1.10.1-beta.1) are public. Historical initial-publication scripts are disabled and fail closed; do not bypass them. For subsequent changes, follow [the guarded publication guide](docs/PUBLISH_PR.md) with a reviewed PR and exact-commit CI.
 
 ## End-user distribution
 
@@ -128,4 +128,4 @@ The earlier Mac diagnosis showed that the icon resource and importer were valid 
 
 A macOS-native build, Finder icon, Notification Center icon, and actual Spotlight UI search all require final testing on a Mac. A passing Linux/Swift core test is not a claim that the OS indexing issue has been fixed.
 
-Release documentation: [RC1 native QA evidence and remaining gates](RELEASE_GATE.md) · [Source beta release notes](RELEASE_NOTES.md).
+Release documentation: [RC2.3 native QA evidence and distribution limits](RELEASE_GATE.md) · [Source beta release notes](RELEASE_NOTES.md).

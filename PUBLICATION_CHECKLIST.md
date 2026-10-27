@@ -8,12 +8,12 @@ This file supersedes the archived first-publication checklist. `KenshinFuwa/AI-C
 - [x] Public build disables undocumented Claude Web quota polling and excludes vendor logo bitmaps.
 - [x] Original RC2.2 macOS native QA completed on 2026-10-25: eight PASS gates, 128-file manifest, Python 115 tests, Swift core 111 tests, release build, Codex mock and Universal 2 / disposable DMG layout. The original source ZIP SHA-256 is pinned in RELEASE_GATE.md.
 - [x] This publication synchronization preserves the Mac-tested RC2.3 application Swift code, tests, localization, workflows and build scripts byte-for-byte. The manifest is regenerated for document changes.
-- [x] On 2026-10-26 GitHub account/repository access was verified restored; `main` remains `c237d3fa`.
-- [ ] Owner reviews the final proposed PR diff against current `main`, including README/security, source, permissions, and localization.
+- [x] GitHub access restored; PR #11 merged to `main` at `9c371da7b4a362ec517e4b9a9b514eda915def48` on 2026-10-27.
+- [x] PR #11 source changes were reviewed and merged to `main`.
 - [x] Original RC2.3 owner-Mac QA: 8/8 PASS; 115 Python / 114 Swift tests, build, Codex mock and Universal 2 checks.
-- [ ] Confirm remote CI passes on the exact publication commit (which contains documentation-only changes relative to the Mac-tested RC2.3 ZIP).
+- [x] All four GitHub CI checks succeeded on published commit `9c371da7b4a362ec517e4b9a9b514eda915def48`.
 - [ ] Validate actual native English/Japanese UI, Codex/Claude live data provenance and observed time using a deliberately authorized test profile.
-- [ ] Create an explicitly marked **source-only prerelease**, with source archive checksum and release notes, following owner review.
+- [x] Published [v1.10.1-beta.1](https://github.com/KenshinFuwa/AI-Checker/releases/tag/v1.10.1-beta.1) as a **source-only prerelease** with English release notes and no binary assets. GitHub-generated archive bytes must not be equated with the owner-Mac tested source ZIP checksum.
 
 ## Public installer requirements (not met)
 

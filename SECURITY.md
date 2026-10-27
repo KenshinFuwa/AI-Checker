@@ -1,6 +1,6 @@
 # Security policy
 
-**Status:** source-only v1.10.1 RC2.3 candidate. The original RC2.3 source passed eight owner-Mac offline QA gates on 2026-10-25 (Python 115, Swift 114, native release build, Codex mock, Universal 2/temporary DMG). The publication synchronization changes only documentation and checksum records, not the Mac-tested runtime. Exact proposed-commit GitHub CI, live GUI/account validation and safe end-user installation remain outstanding. No general-public Developer ID-signed/notarized application or DMG exists.
+**Status:** [v1.10.1-beta.1 source-only pre-release](https://github.com/KenshinFuwa/AI-Checker/releases/tag/v1.10.1-beta.1) published on 2026-10-27 from `9c371da7b4a362ec517e4b9a9b514eda915def48` with 4/4 GitHub CI checks successful. The original RC2.3 source passed eight owner-Mac offline QA gates on 2026-10-25 (Python 115, Swift 114, native release build, Codex mock, Universal 2/temporary DMG). Public-source GUI/account validation, safe upgrades and clean-machine installation remain outstanding. No general-public Developer ID-signed/notarized application or DMG exists.
 
 Please **do not open public issues containing credentials, cookies, tokens, server addresses, or private account details**. To disclose a vulnerability, use GitHub private vulnerability reporting when enabled, or a verified private maintainer contact method. Never post access tokens in public tickets.
 

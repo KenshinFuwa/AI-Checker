@@ -234,6 +234,9 @@
 "利用制限を取得できません。次回再試行します。" = "Could not fetch usage limits. Will retry later.";
 "例: Proモデル 残り28%、リセット 18:00" = "Example: Pro model 28% remaining; resets at 18:00";
 
+"Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。" = "Claude: No quota data has arrived from the official statusLine (Claude Code integration is optional).";
+"割り当てに失敗: %@" = "Could not register shortcut: %@";
+
 /* Native usage menu (V4 localization port, production safe) */
 "%@ Details" = "%@ Details";
 "5h残量: %@" = "5h Remaining: %@";

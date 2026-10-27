@@ -85,6 +85,45 @@ class LocalizationContracts(unittest.TestCase):
         self.assertIn('AppL10n.format("ChatGPT接続済み（%@）%@", self.profile.label, verified)', codex)
         self.assertIn('AppL10n.format("%@の制限がリセットされました（残り%d%%）"', notification)
 
+    def test_menu_help_and_shortcut_errors_are_localized(self):
+        main = (ROOT / 'Sources/AIChecker/main.swift').read_text()
+        en = entries(ROOT / 'Localization/en.lproj/Localizable.strings')
+        ja = entries(ROOT / 'Localization/ja.lproj/Localizable.strings')
+        help_body = main.split('private func showMenuBarHelp()', 1)[1].split('private func addQuickAccessMenu', 1)[0]
+        keys = (
+            'メニューバーに空きがないと、macOSがアイコンを表示できないことがあります。\\n\\n',
+            '1. AI Checkerの表示設定で『アイコンのみ』または『省スペース』を選択します。\\n',
+            '2. システム設定 → メニューバー（macOSのバージョンによって項目名が異なります）で不要な標準アイコンを整理します。\\n',
+            '3. 他社アプリは各アプリの設定でメニューバー表示をOFFにします。\\n',
+            '4. AI Checkerが隠れていても、設定したショートカットで利用状況パネルを開けます。\\n\\n',
+            'AI Checkerは他アプリのアイコンを移動・非表示にしたり、アクセシビリティ権限を要求したりしません。',
+        )
+        for key in keys:
+            self.assertIn(f'AppL10n.text("{key}")', help_body)
+            self.assertIn(key, en)
+            self.assertIn(key, ja)
+            self.assertFalse(JAPANESE.search(en[key]))
+            self.assertEqual(ja[key], key)
+        shortcut_key = '割り当てに失敗: %@'
+        self.assertIn('AppL10n.format("割り当てに失敗: %@", error)', main)
+        self.assertNotIn('"割り当てに失敗: " + error', main)
+        self.assertEqual(en[shortcut_key].count('%@'), 1)
+        self.assertEqual(ja[shortcut_key], shortcut_key)
+        self.assertFalse(JAPANESE.search(en[shortcut_key]))
+
+    def test_claude_missing_statusline_is_localized_without_faking_quota(self):
+        source = (ROOT / 'Sources/AIChecker/AIUsageSource.swift').read_text()
+        en = entries(ROOT / 'Localization/en.lproj/Localizable.strings')
+        ja = entries(ROOT / 'Localization/ja.lproj/Localizable.strings')
+        key = 'Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。'
+        self.assertIn(f'errors: [AppL10n.text("{key}")]', source)
+        self.assertIn('SourceOutcome(snapshots: [:]', source)
+        self.assertIn('guard let snapshot = ClaudeStatusLineStore.read(profileID: profileID)', source)
+        self.assertIn(key, en)
+        self.assertEqual(ja[key], key)
+        self.assertFalse(JAPANESE.search(en[key]))
+        self.assertIn('statusLine', en[key])
+
     def test_offline_codex_bridge_includes_portable_localizer(self):
         helper = (ROOT / 'Sources/AIChecker/AppLocalization.swift').read_text()
         bridge = (ROOT / 'scripts/test-codex-bridge.sh').read_text()

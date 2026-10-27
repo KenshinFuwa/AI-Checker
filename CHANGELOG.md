@@ -1,3 +1,9 @@
+## Unreleased — localize menu bar troubleshooting and Claude data-unavailable state
+
+- Translate all four menu-bar-space troubleshooting steps and the shortcut registration failure without altering the actions they perform.
+- Localize the optional first-party Claude Code statusLine-unavailable message; unknown usage stays unknown and no fallback web quota reader is enabled.
+- Add English/Japanese localization contract tests. This is a source-only follow-up to v1.10.1-beta.1, not a new installer or change to the published tag.
+
 ## v1.10.1 — Intel macOS runner executable smoke gate
 
 - Add a native `macos-15-intel` CI job that checks `uname -m = x86_64` and executes the app's packaged AppKit bootstrap from a mounted disposable Universal 2 DMG.

@@ -234,6 +234,9 @@
 "利用制限を取得できません。次回再試行します。" = "利用制限を取得できません。次回再試行します。";
 "例: Proモデル 残り28%、リセット 18:00" = "例: Proモデル 残り28%、リセット 18:00";
 
+"Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。" = "Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。";
+"割り当てに失敗: %@" = "割り当てに失敗: %@";
+
 /* Native usage menu (V4 localization port, production safe) */
 "%@ Details" = "%@ の詳細";
 "5h残量: %@" = "5時間残量: %@";

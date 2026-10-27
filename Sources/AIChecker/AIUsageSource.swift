@@ -48,7 +48,7 @@ struct ClaudeStatusLineSource: AIUsageSource {
     let sourceID = "claude-first-party-statusline"
     func fetch() -> SourceOutcome {
         guard let snapshot = ClaudeStatusLineStore.read(profileID: profileID) else {
-            return SourceOutcome(snapshots: [:], errors: ["Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。"])
+            return SourceOutcome(snapshots: [:], errors: [AppL10n.text("Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。")])
         }
         return SourceOutcome(snapshots: ["claude": snapshot], errors: [])
     }

@@ -343,11 +343,11 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         let alert = NSAlert()
         alert.messageText = AppL10n.text("メニューバーにAI Checkerが表示されない場合")
         alert.informativeText = AppL10n.text("メニューバーに空きがないと、macOSがアイコンを表示できないことがあります。\n\n") +
-            "1. AI Checkerの表示設定で『アイコンのみ』または『省スペース』を選択します。\n" +
-            "2. システム設定 → メニューバー（macOSのバージョンによって項目名が異なります）で不要な標準アイコンを整理します。\n" +
-            "3. 他社アプリは各アプリの設定でメニューバー表示をOFFにします。\n" +
-            "4. AI Checkerが隠れていても、設定したショートカットで利用状況パネルを開けます。\n\n" +
-            "AI Checkerは他アプリのアイコンを移動・非表示にしたり、アクセシビリティ権限を要求したりしません。"
+            AppL10n.text("1. AI Checkerの表示設定で『アイコンのみ』または『省スペース』を選択します。\n") +
+            AppL10n.text("2. システム設定 → メニューバー（macOSのバージョンによって項目名が異なります）で不要な標準アイコンを整理します。\n") +
+            AppL10n.text("3. 他社アプリは各アプリの設定でメニューバー表示をOFFにします。\n") +
+            AppL10n.text("4. AI Checkerが隠れていても、設定したショートカットで利用状況パネルを開けます。\n\n") +
+            AppL10n.text("AI Checkerは他アプリのアイコンを移動・非表示にしたり、アクセシビリティ権限を要求したりしません。")
         alert.addButton(withTitle: "OK")
         alert.runModal()
     }
@@ -379,7 +379,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             self?.setShortcut(enabled: self?.shortcutEnabled ?? true, preset: preset)
         }
         if let error = globalHotkey.errorMessage, shortcutEnabled {
-            let hint = NSMenuItem(title: "割り当てに失敗: " + error, action: nil, keyEquivalent: "")
+            let hint = NSMenuItem(title: AppL10n.format("割り当てに失敗: %@", error), action: nil, keyEquivalent: "")
             menu.addItem(hint)
         }
         addStayOpenRow("利用状況パネルを開く", to: menu,

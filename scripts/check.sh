@@ -70,6 +70,7 @@ python3 Tests/test_localization_integration.py
 python3 Tests/test_release_checksum.py
 python3 Tests/test_free_preview.py
 python3 Tests/test_packaged_bootstrap.py
+python3 Tests/test_isolated_e2e_preflight.py
 python3 Tests/test_release_invariants.py
 python3 Tests/test_consumer_web_integration.py
 python3 Tests/test_quota_notifications_integration.py

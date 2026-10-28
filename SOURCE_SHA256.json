@@ -106,7 +106,7 @@
     "docs/LOCALIZATION.md": "bbaaf8f040edc5cbba2535e3435cc1a6e2f20909e55ea406d52641f67a2da4b4",
     "docs/PUBLISH_PR.md": "cc39576b0de6836d3831996e6a00e8d7a479830bd7296cddd61fd0a711366613",
     "docs/UNNOTARIZED_TEST_PREVIEW.md": "39b6ab8b08b37aa97a424b5c56756a9f196d113618a1712013ee8c056743b5eb",
-    "scripts/audit-release-dmg.sh": "45a28e08352f3e9b9dafe58cf1fff6ef2b2bf8b9476b79465a70c7a0a55560ad",
+    "scripts/audit-release-dmg.sh": "c8b527ff2307fdb331cbca6520041d548abfa1e9f00f52d91154171b5561ada9",
     "scripts/build-free-preview-dmg.sh": "1ad991db8eda031d796d3fcf244bd82fa2abd4f6fee52c01f121293dc62516f5",
     "scripts/build-notarized-dmg.sh": "5f31422cf89e63b5d035092e819763e783fd9e33281431fee861ccc411afcb0a",
     "scripts/build-universal-binary.sh": "6145110d46f37af2131311463892571e6b236dffff95a800f4eb1f252977626b",

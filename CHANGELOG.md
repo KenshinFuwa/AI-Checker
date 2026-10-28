@@ -1,3 +1,9 @@
+## Unreleased — packaged native en/ja locale CI smoke
+
+- On the disposable unsigned CI DMG, exercise native AppKit menu localization under process-only English and Japanese language overrides, in addition to the existing no-account packaged bootstrap.
+- Confirm translated refresh, troubleshooting, shortcut and optional Claude statusLine-unavailable strings resolve from the actual staged app bundle. No persistent defaults, Keychain, login items, provider accounts, notifications, installed apps or event loop are accessed.
+- This automated smoke test is **not** a real first-run UI, authenticated account E2E, clean-machine Gatekeeper test or notarized installer.
+
 ## Unreleased — localize menu bar troubleshooting and Claude data-unavailable state
 
 - Translate all four menu-bar-space troubleshooting steps and the shortcut registration failure without altering the actions they perform.

@@ -30,7 +30,7 @@ Both values above are **placeholders**; do not copy them without substituting yo
 
 ## 4. Mandatory release gates
 
-The owner-Mac original RC2.2 QA on 2026-10-25 passed eight offline gates (Python 115, Swift 111, release build, Codex mock and Universal 2 temporary DMG checks). Documentation synchronization does not alter the runtime, but exact-commit CI of the final GitHub publication remains unverified. None of those gates establishes end-user binary distribution readiness.
+The owner-Mac RC2.3 QA passed eight offline gates (Python 115, Swift 114, release build, Codex mock and Universal 2 temporary DMG checks). The subsequent published source-only beta.2 (commit `0a096096a70e27c1550918cd6d2756dc45fa1050`) passed all four GitHub CI jobs. The disposable unsigned-DMG smoke now also checks bundled English and Japanese localization under process-only language overrides. These automated tests are **not** authenticated real-account E2E, true first-run UI testing, clean-machine Gatekeeper verification or binary-distribution approval.
 
 - [x] Audit all four PR #7 CI jobs (Linux, native macOS, Universal 2/DMG, Intel x86_64 packaged AppKit bootstrap); run `39977688759` passed. This is **not** notarization or clean-install proof.
 - [ ] Apple notary status **Accepted**, `stapler validate` PASS and signing chain/Team ID verified.

@@ -2017,6 +2017,44 @@ if CommandLine.arguments.contains("--ingest-claude-statusline") {
         fputs("FAIL: AppKit menu or bundle icon assignment\n", stderr)
         exit(1)
     }
+
+    // CI-only locale smoke: process arguments select a language without changing
+    // system/application preferences. Do not load accounts or enter the app loop.
+    if let option = CommandLine.arguments.firstIndex(of: "--selftest-language") {
+        guard CommandLine.arguments.indices.contains(option + 1) else {
+            fputs("FAIL: missing locale argument\n", stderr)
+            exit(1)
+        }
+        let language = CommandLine.arguments[option + 1]
+        guard language == "en" || language == "ja",
+              Bundle.main.preferredLocalizations.first == language else {
+            fputs("FAIL: bundled locale negotiation\n", stderr)
+            exit(1)
+        }
+        let english = language == "en"
+        let expectedRefresh = english ? "Refresh Now" : "今すぐ更新"
+        let expectedHelp = english ? "If AI Checker Is Missing from the Menu Bar" : "メニューバーにAI Checkerが表示されない場合"
+        let expectedShortcut = english ? "Could not register shortcut: TEST" : "割り当てに失敗: TEST"
+        let expectedClaude = english
+            ? "Claude: No quota data has arrived from the official statusLine (Claude Code integration is optional)."
+            : "Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。"
+        guard AppL10n.text("今すぐ更新") == expectedRefresh,
+              AppL10n.text("メニューバーにAI Checkerが表示されない場合") == expectedHelp,
+              AppL10n.format("割り当てに失敗: %@", "TEST") == expectedShortcut,
+              AppL10n.text("Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。") == expectedClaude else {
+            fputs("FAIL: bundle localization lookup\n", stderr)
+            exit(1)
+        }
+        let localizedMenu = NSMenu(title: "メニューバーにAI Checkerが表示されない場合")
+        localizedMenu.addItem(withTitle: "今すぐ更新", action: nil, keyEquivalent: "")
+        AppL10n.apply(to: localizedMenu)
+        guard localizedMenu.title == expectedHelp,
+              localizedMenu.items.first?.title == expectedRefresh else {
+            fputs("FAIL: AppKit native menu localization\n", stderr)
+            exit(1)
+        }
+        print("PASS: bundled \(language) localization and native menu (no account, no UI event loop)")
+    }
     NSStatusBar.system.removeStatusItem(statusItem)
     print("PASS: packaged AppKit bootstrap, menu-bar item, icon and identity")
     print("TEST_SCOPE: no user data, no network, no login item, no notification, no event loop")

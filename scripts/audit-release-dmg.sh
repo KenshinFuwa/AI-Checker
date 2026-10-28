@@ -80,6 +80,9 @@ if [[ "${AI_CHECKER_CI_BOOTSTRAP:-0}" == "1" ]]; then
         exit 3
     }
     "$EXE" --selftest-packaged-bootstrap
+    # Language is selected only for these short-lived test processes; no persistent preferences or app installation.
+    "$EXE" -AppleLanguages "(en)" --selftest-packaged-bootstrap --selftest-language en
+    "$EXE" -AppleLanguages "(ja)" --selftest-packaged-bootstrap --selftest-language ja
 fi
 if [[ "$MODE" == --signed-release ]]; then
     codesign --verify --strict --verbose=2 "$APP"

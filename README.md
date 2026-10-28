@@ -36,6 +36,8 @@ Unknown or stale usage is not displayed as a fabricated percentage. Notification
 - AI Checker does **not** detect every other status item's visibility, move or hide other apps' icons, or require global keyboard event monitoring. Do not claim automatic available-width detection.
 - The app ships its own navy-and-teal progress-ring/check `AppIcon.icns`, not any provider's trademarked icon.
 
+To prepare a separate-user native E2E test without touching an installed app, use the [read-only fail-closed preflight and manual protocol](docs/ISOLATED_E2E_PROTOCOL.md). A preflight READY does **not** establish a working GUI or authenticated provider integration.
+
 ## Requirements
 
 - macOS 13 or newer (some optional local WebKit account-management features may require newer macOS).

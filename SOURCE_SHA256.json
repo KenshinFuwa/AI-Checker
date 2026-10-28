@@ -1,6 +1,6 @@
 {
   "algorithm": "SHA-256",
-  "file_count": 128,
+  "file_count": 131,
   "files": {
     ".github/workflows/mac-validation.yml": "c02eb75c92f961322b1fe54f03e76ffdb0faa34b9fa4b0e439a31eeeeab92b5d",
     ".github/workflows/unnotarized-preview.yml": "47a6312aa69ae2dafa0455184a30991e18261b36f83d31685f78782b21fddbed",
@@ -14,7 +14,7 @@
     "PUBLICATION_AUDIT.md": "99c766db7c086979dc0786b4b314ed62f0063aae4005f444e7e115344769303e",
     "PUBLICATION_CHECKLIST.md": "c5915e111986696456307ad6dc479193d5c4aebbc0a4d88a75e8fc3e1a5e324e",
     "Package.swift": "b60fb2a19437f7a67e238ae1b88d955d733ee2fee134962af98c63cd0e36986f",
-    "README.md": "f5bb81c01196175216db4d95ce03b69d78ad04cd438b9f96ba459cd37ed2451f",
+    "README.md": "996c90c5543a41d1648179464a0ba47d7f292138dad18e8eb79d6615873c3f75",
     "RELEASE_GATE.md": "080b0d4b8a98f8fba3ced5f90535e6bbfea1936ca6727454b07e5690c6bdb63b",
     "RELEASE_NOTES.md": "e51d0fa0155df39fa63c1989076a4f94d72313151649624f344f8ea50630765b",
     "SECURITY.md": "b54cc664c86f25689c2586aee97c4770b923265442a8af0ebaf487ffd6b45046",
@@ -110,9 +110,9 @@
     "scripts/build-free-preview-dmg.sh": "1ad991db8eda031d796d3fcf244bd82fa2abd4f6fee52c01f121293dc62516f5",
     "scripts/build-notarized-dmg.sh": "5f31422cf89e63b5d035092e819763e783fd9e33281431fee861ccc411afcb0a",
     "scripts/build-universal-binary.sh": "6145110d46f37af2131311463892571e6b236dffff95a800f4eb1f252977626b",
-    "scripts/check-source-core.sh": "7c78b5ee98282cdb5827776ba3a9b46e4974ebd4e4c6314173ca02a6911f50f0",
+    "scripts/check-source-core.sh": "c07d355a361e603360351dbd4e2472f891f796704e05cc4fdc1cc3ed17f57acd",
     "scripts/check-universal-build.sh": "e924087b8490c368fc4cb01abdc876ed3af35e2b20d86e29a2a86e8658e87a9c",
-    "scripts/check.sh": "b0893cec22593d42800385b6506c9ff975e447ca5581f1a818c211a7779eaee3",
+    "scripts/check.sh": "0577103a5da7b00ff9212bf577d3bff22ed40ce39a333b9c0ad7b0dbfcada26b",
     "scripts/cleanup-legacy.sh": "0a3e7cf7f4466d63f4f0f7cb04803fa6f0737e258dc1cc6990113e6e9c41a321",
     "scripts/diagnose-app-identity.sh": "a5921f091d01b08e1184398c6d1bb8f63f2c6adae8be0daee43a92d5d18d4f5c",
     "scripts/diagnose-spotlight.sh": "e87292748437ab0b458ee390d1dc3a301567ca32d70050c953181ec471815f7c",
@@ -129,6 +129,9 @@
     "scripts/test-claude-telemetry.sh": "73a0b0cb651ba8eb52ebe05942f41393d6321d5642ec1be1e6f4a546c6c9d98f",
     "scripts/test-codex-bridge.sh": "64404e70edae6b4dab8d8c6d0dddaeb1959d07bc4093a9071957d3a1a54ecaa5",
     "scripts/verify-release-checksum.py": "91dabfa61b2ea0fc8e8244718348fc1d09206b2663fb0635b9951e668d085e13",
-    "scripts/verify-source-manifest.py": "ed9af2748bc46f8617f477b1b34b1b07c3075ea061376ab0a11711539000fa24"
+    "scripts/verify-source-manifest.py": "ed9af2748bc46f8617f477b1b34b1b07c3075ea061376ab0a11711539000fa24",
+    "scripts/preflight-isolated-e2e.py": "fcbe357844e13921e8877a852d35497769e08e65cd7395f6faa017e25c4f7023",
+    "Tests/test_isolated_e2e_preflight.py": "9775923aeec26009dba59bde2fe0aee0875ffa06876ea99ac96a0a49bdec7af1",
+    "docs/ISOLATED_E2E_PROTOCOL.md": "024ea16da143c17f344a8f16e52e0e545b04717506812aff0226807808d6edd5"
   }
 }

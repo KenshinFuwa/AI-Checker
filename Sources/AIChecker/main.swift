@@ -163,7 +163,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         // pre-existing Cmd+R shortcut on the app's keyboard command menu.
         let actionsItem = NSMenuItem(title: "Actions", action: nil, keyEquivalent: "")
         let actionsMenu = NSMenu(title: "Actions")
-        let refreshItem = NSMenuItem(title: AppL10n.text("今すぐ更新"), action: #selector(refreshNow), keyEquivalent: "r")
+        let refreshItem = NSMenuItem(title: AppL10n.text("残量を更新"), action: #selector(refreshNow), keyEquivalent: "r")
         refreshItem.target = self
         refreshItem.keyEquivalentModifierMask = [.command]
         actionsMenu.addItem(refreshItem)
@@ -689,7 +689,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         menu.addItem(withTitle: AppL10n.format("最終同期: %@%@", dateText(lastSuccess), isStale ? AppL10n.text("（古い／未取得）") : ""), action: nil, keyEquivalent: "")
         if let error = lastError { menu.addItem(withTitle: AppL10n.format("取得エラー: %@", error), action: nil, keyEquivalent: "") }
         if !demo {
-            addStayOpenRow("今すぐ更新", to: menu,
+            addStayOpenRow("残量を更新", to: menu,
                 enabledWhen: { [weak self] in
                     guard let self else { return false }
                     return !self.fetching && !self.sleeping
@@ -806,7 +806,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             command("ログアウト…", .logoutCodex, enabledWhen: { [weak self] in self?.accountConfig.activeCodex != nil })
             command("名前を変更…", .renameCodex, enabledWhen: { [weak self] in self?.accountConfig.activeCodex != nil })
             command("選択中アカウントを削除…", .removeCodex, enabledWhen: { [weak self] in self?.accountConfig.activeCodex != nil })
-            command("再接続", .reconnectCodex)
+            command("残量を更新", .refreshQuotas)
+            command("接続を修復", .reconnectCodex)
             command("Codex CLIの場所を選択…", .chooseCodexCLI)
         case .claude:
             menu.addItem(MenuVisualStyle.heading("CLAUDE / プロフィール"))
@@ -818,7 +819,8 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             }
             menu.addItem(.separator())
             command("プロフィールを追加…", .addClaude)
-            command("Claude Codeでログイン…", .loginClaudeCode,
+            command("残量を更新", .refreshQuotas)
+            command("接続を設定…", .loginClaudeCode,
                     enabledWhen: { [weak self] in self?.accountConfig.activeClaude != nil })
             command("名前を変更…", .renameClaude,
                     enabledWhen: { [weak self] in self?.accountConfig.activeClaude != nil })
@@ -1094,6 +1096,7 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         case .renameCodex: renameCodex()
         case .removeCodex: removeCodex()
         case .reconnectCodex: reconnectCodex()
+        case .refreshQuotas: refresh(force: true)
         case .chooseCodexCLI: chooseCodexExecutable()
         case .addClaude: addClaudeAccount()
         case .loginClaudeWeb: openClaudeWeb()

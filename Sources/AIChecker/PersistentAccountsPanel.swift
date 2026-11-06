@@ -4,7 +4,7 @@ import AICheckerCore
 /// Actions are dispatched by the application. This view never accesses or stores credentials.
 enum AccountPanelAction {
     case selectCodex(UUID), selectClaude(UUID)
-    case addCodex, loginCodex, logoutCodex, renameCodex, removeCodex, reconnectCodex, chooseCodexCLI
+    case addCodex, loginCodex, logoutCodex, renameCodex, removeCodex, reconnectCodex, refreshQuotas, chooseCodexCLI
     case addClaude, loginClaudeWeb, refreshClaudeWeb, disconnectClaudeWeb, loginClaudeCode, renameClaude, removeClaude
     case configureCopilot, disconnectCopilot, refreshCopilot, copilotInfo, copilotTroubleshooting, toggleCopilotBar
     case configureAPI(ExternalAPIKind), refreshAPI(ExternalAPIKind), disconnectAPI(ExternalAPIKind)
@@ -148,7 +148,8 @@ final class PersistentAccountsPanel: NSObject, NSWindowDelegate {
                      .command("選択中アカウントからログアウト", .logoutCodex, !state.codex.isEmpty),
                      .command("名前を変更…", .renameCodex, !state.codex.isEmpty),
                      .command("選択中アカウントを削除…", .removeCodex, !state.codex.isEmpty),
-                     .command("再接続", .reconnectCodex, true),
+                     .command("残量を更新", .refreshQuotas, true),
+                     .command("接続を修復", .reconnectCodex, true),
                      .command("Codex CLIの場所を選択…", .chooseCodexCLI, true)]
         case .claude:
             rows += [.caption("CLAUDE  /  プロフィール管理"), .label("状態: \(state.claudeStatus)")]
@@ -157,7 +158,8 @@ final class PersistentAccountsPanel: NSObject, NSWindowDelegate {
                 rows.append(.command("\(record.selected ? "✓ " : "○ ")\(record.label)", .selectClaude(record.id), true))
             }
             rows += [.command("プロフィールを追加…", .addClaude, true),
-                     .command("Claude Codeでログイン…", .loginClaudeCode, !state.claude.isEmpty),
+                     .command("残量を更新", .refreshQuotas, true),
+                     .command("接続を設定…", .loginClaudeCode, !state.claude.isEmpty),
                      .command("名前を変更…", .renameClaude, !state.claude.isEmpty),
                      .command("選択中プロフィールを削除…", .removeClaude, !state.claude.isEmpty)]
         case .copilot:

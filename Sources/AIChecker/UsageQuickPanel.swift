@@ -90,7 +90,7 @@ final class UsageQuickPanel {
         key.action = #selector(setKey(_:))
         inner.addSubview(key)
 
-        let refresh = NSButton(title: AppL10n.text("今すぐ更新"), target: self, action: #selector(refreshAction))
+        let refresh = NSButton(title: AppL10n.text("残量を更新"), target: self, action: #selector(refreshAction))
         refresh.frame = NSRect(x: width - 132, y: 13, width: 110, height: 28)
         inner.addSubview(refresh)
         let help = NSButton(title: AppL10n.text("整理方法"), target: self, action: #selector(guideAction))

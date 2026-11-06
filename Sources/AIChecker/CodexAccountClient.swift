@@ -25,14 +25,17 @@ final class CodexAccountClient {
     private let home: URL
     private let executableOverride: URL?
     private var stopRequested = false
+    // Ignore output/EOF from an older app-server process after reconnection.
+    private var processGeneration: UInt64 = 0
 
     enum ClientError: LocalizedError {
-        case missingBinary, invalidOutput, transportClosed, failed(String)
+        case missingBinary, invalidOutput, transportClosed, timedOut, failed(String)
         var errorDescription: String? {
             switch self {
             case .missingBinary: return AppL10n.text("Codex CLIが見つかりません。codexの場所を設定してください。")
             case .invalidOutput: return AppL10n.text("Codex App Serverの応答形式が不正です。")
             case .transportClosed: return AppL10n.text("Codex App Serverとの接続が終了しました。")
+            case .timedOut: return AppL10n.text("Codex応答がタイムアウトしました")
             case .failed(let message): return message
             }
         }
@@ -97,20 +100,31 @@ final class CodexAccountClient {
             process = child
             input = stdin.fileHandleForWriting
             running = true
+            processGeneration &+= 1
+            let generation = processGeneration
             state(AppL10n.text("Codex App Serverに接続中…"))
             let output = stdout.fileHandleForReading
             DispatchQueue.global(qos: .utility).async { [weak self] in
                 while true {
                     let chunk = output.availableData
                     if chunk.isEmpty { break }
-                    self?.queue.async { [weak self] in self?.consume(chunk) }
+                    self?.queue.async { [weak self] in
+                        guard let self, self.processGeneration == generation else { return }
+                        self.consume(chunk)
+                    }
                 }
-                self?.queue.async { [weak self] in self?.connectionClosed() }
+                self?.queue.async { [weak self] in
+                    guard let self, self.processGeneration == generation else { return }
+                    self.connectionClosed()
+                }
             }
             request("initialize", params: ["clientInfo": ["name": "ai_checker", "title": "AI Checker", "version": "1.3.0"]]) { [weak self] reply in
                 guard let self = self else { return }
                 switch reply {
-                case .failure: self.state(AppL10n.text("初期化に失敗しました")); self.stopInternal()
+                case .failure:
+                    guard !self.stopRequested else { return }
+                    self.state(AppL10n.text("初期化に失敗しました"))
+                    self.stopInternal()
                 case .success:
                     self.isInitialized = true
                     self.notify("initialized", params: [:])
@@ -144,7 +158,7 @@ final class CodexAccountClient {
         send(request)
         queue.asyncAfter(deadline: .now() + 20) { [weak self] in
             guard let self = self, let callback = self.pending.removeValue(forKey: id) else { return }
-            callback(.failure(ClientError.failed(AppL10n.text("Codex応答がタイムアウトしました"))))
+            callback(.failure(ClientError.timedOut))
         }
     }
 
@@ -212,24 +226,58 @@ final class CodexAccountClient {
         }
     }
 
-    func readLimits() {
+    /// A forced user refresh repairs the isolated official transport before
+    /// obtaining quotas. Periodic refresh can also recover a stopped server.
+    /// Both paths reuse the same dedicated CODEX_HOME without starting OAuth.
+    func refreshUsage(force: Bool) {
         queue.async { [weak self] in
-            guard let self = self, self.running, self.authenticated else { return }
-            self.request("account/rateLimits/read") { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .failure:
-                    self.failure(.init(.networkUnavailable))
-                    self.state(AppL10n.text("利用制限を取得できません。次回再試行します。"))
-                case .success(let reply):
-                    if let valid = CodexAppServerQuotaDecoder.decodeResult(reply) {
-                        self.snapshot(valid)
-                    } else {
-                        // Preserve last successful reading until freshness TTL;
-                        // absence of a quota is not a logout or a zero percent.
-                        self.failure(.init(.invalidResponse))
-                        self.state(AppL10n.text("利用制限が返されませんでした（前回値は期限付き保持）"))
+            guard let self, !self.isLoggingIn else { return }
+            if force {
+                // A process can appear alive but stop responding after a
+                // connectivity change; rebuild it without deleting its login.
+                self.stopInternal()
+                self.startInternal()
+            } else if !self.running {
+                self.startInternal()
+            } else if self.isInitialized {
+                if self.authenticated { self.readLimitsInternal(retriesRemaining: 1) }
+                else { self.readAccount() }
+            }
+            // An initializing server always reads account + quotas on success.
+        }
+    }
+
+    func readLimits() {
+        queue.async { [weak self] in self?.readLimitsInternal(retriesRemaining: 1) }
+    }
+
+    private func readLimitsInternal(retriesRemaining: Int) {
+        guard running, authenticated, !stopRequested else { return }
+        request("account/rateLimits/read") { [weak self] result in
+            guard let self, !self.stopRequested else { return }
+            switch result {
+            case .failure(let error):
+                // One delayed retry for a transport timeout only. RPC errors
+                // (potentially including rate limits) must NOT be retried.
+                if retriesRemaining > 0, let clientError = error as? ClientError {
+                    if case .timedOut = clientError {
+                        let generation = self.processGeneration
+                        self.queue.asyncAfter(deadline: .now() + 3) { [weak self] in
+                            guard let self, self.processGeneration == generation else { return }
+                            self.readLimitsInternal(retriesRemaining: retriesRemaining - 1)
+                        }
+                        return
                     }
+                }
+                self.failure(.init(.networkUnavailable))
+                self.state(AppL10n.text("利用制限を取得できません。次回再試行します。"))
+            case .success(let reply):
+                if let valid = CodexAppServerQuotaDecoder.decodeResult(reply) {
+                    self.snapshot(valid)
+                } else {
+                    // An absent quota is never a logout or a fabricated 0%.
+                    self.failure(.init(.invalidResponse))
+                    self.state(AppL10n.text("利用制限が返されませんでした（前回値は期限付き保持）"))
                 }
             }
         }
@@ -290,6 +338,7 @@ final class CodexAccountClient {
 
     private func stopInternal() {
         stopRequested = true
+        processGeneration &+= 1
         isInitialized = false
         loginRequested = false
         authenticated = false

@@ -237,6 +237,10 @@
 "Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。" = "Claude: No quota data has arrived from the official statusLine (Claude Code integration is optional).";
 "割り当てに失敗: %@" = "Could not register shortcut: %@";
 
+"残量を更新" = "Refresh Usage";
+"接続を修復" = "Repair Connection";
+"接続を設定…" = "Set Up Connection…";
+
 /* Native usage menu (V4 localization port, production safe) */
 "%@ Details" = "%@ Details";
 "5h残量: %@" = "5h Remaining: %@";

@@ -237,6 +237,10 @@
 "Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。" = "Claude: 公式statusLineから使用率が届いていません（Claude Code連携は任意）。";
 "割り当てに失敗: %@" = "割り当てに失敗: %@";
 
+"残量を更新" = "残量を更新";
+"接続を修復" = "接続を修復";
+"接続を設定…" = "接続を設定…";
+
 /* Native usage menu (V4 localization port, production safe) */
 "%@ Details" = "%@ の詳細";
 "5h残量: %@" = "5時間残量: %@";

@@ -9,7 +9,7 @@ protocol LiveProviderAdapter: AnyObject {
 
 extension CodexAccountClient: LiveProviderAdapter {
     var providerID: String { "codex" }
-    func requestUsage(force: Bool) { readLimits() }
+    func requestUsage(force: Bool) { refreshUsage(force: force) }
 }
 
 extension ClaudeWebSession: LiveProviderAdapter {

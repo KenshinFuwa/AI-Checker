@@ -282,3 +282,5 @@
 "AI CheckerはClaude Codeを自動ログアウトできません。専用セッションを開き、Claude Codeで /logout を実行してください。操作後に接続状態を確認してください。" = "AI CheckerはClaude Codeを自動ログアウトできません。専用セッションを開き、Claude Codeで /logout を実行してください。操作後に接続状態を確認してください。";
 "専用セッションを開く" = "専用セッションを開く";
 "Claude Codeで接続…" = "Claude Codeで接続…";
+"CLAUDE / アカウント" = "CLAUDE / アカウント";
+"CLAUDE  /  アカウント管理" = "CLAUDE  /  アカウント管理";

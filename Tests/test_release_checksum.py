@@ -16,7 +16,7 @@ class ChecksumContracts(unittest.TestCase):
         self._td = tempfile.TemporaryDirectory()
         self.addCleanup(self._td.cleanup)
         self.base = pathlib.Path(self._td.name)
-        self.dmg = self.base / 'AI-Checker-v1.10.1-notarized.dmg'
+        self.dmg = self.base / 'AI-Checker-v1.11.0-notarized.dmg'
         self.dmg.write_bytes(b'dummy bytes for isolated checksum unit test')
         self.sha = self.base / (self.dmg.name + '.sha256')
         self.hash = hashlib.sha256(self.dmg.read_bytes()).hexdigest()

@@ -201,7 +201,7 @@ class ReleaseInvariants(unittest.TestCase):
         self.assertIn('addAccountsSubmenu("GitHub Copilotアカウント管理"', main)
         self.assertIn('item.submenu = menu', main)
         self.assertIn('command("アカウントを追加…", .addCodex)', main)
-        self.assertIn('command("プロフィールを追加…", .addClaude)', main)
+        self.assertIn('command("アカウントを追加…", .addClaude)', main)
         self.assertNotIn('presentAccountsPanel(', main)
         self.assertNotIn('openAccountsPanel(', main)
         self.assertNotIn('window?.makeKeyAndOrderFront(nil)', main)
@@ -222,10 +222,10 @@ class ReleaseInvariants(unittest.TestCase):
         self.assertIn('client.refreshUsage(force: true)', bridge)
         self.assertIn('client.refreshUsage(force: false)', bridge)
         self.assertIn('case .refreshQuotas: refresh(force: true)', main)
-        self.assertEqual(main.count('command("残量を更新", .refreshQuotas)'), 2)
-        self.assertIn('command("接続を修復", .reconnectCodex)', main)
+        self.assertEqual(main.count('command("残量を更新", .refreshQuotas)'), 0)
+        self.assertIn('command("詳細設定…", .advancedCodex)', main)
         self.assertIn('command("接続を設定…", .loginClaudeCode,', main)
-        self.assertIn('.command("残量を更新", .refreshQuotas, true)', panel)
+        self.assertIn('.command("詳細設定…", .advancedClaude, true)', panel)
         self.assertNotIn('UserDefaults.standard', client.split('func refreshUsage(force: Bool)')[1].split('func readLimits()')[0])
 
     def test_all_inplace_menu_actions_stay_open(self):

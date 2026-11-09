@@ -1,6 +1,6 @@
 {
   "algorithm": "SHA-256",
-  "file_count": 131,
+  "file_count": 133,
   "files": {
     ".github/workflows/mac-validation.yml": "c02eb75c92f961322b1fe54f03e76ffdb0faa34b9fa4b0e439a31eeeeab92b5d",
     ".github/workflows/unnotarized-preview.yml": "47a6312aa69ae2dafa0455184a30991e18261b36f83d31685f78782b21fddbed",
@@ -9,8 +9,8 @@
     "Design/AppIcon.icns": "7b68ca462ff0f049f3f09577f0b0f346b9a6e1b37a8a986c8802225a405009bf",
     "Design/AppIcon.png": "f7156529ebfba0f6ec78d2b49e6ffd3ee77638a96e5c22fda1a1a5ab398208de",
     "LICENSE": "34a4f77b5c680a10ea28e35a6d42ee45bc546f533684a590db333123a7f10973",
-    "Localization/en.lproj/Localizable.strings": "0016fd4ae704dd7b7672bfc2a71e6a07939554dd7a09139d6e2076455cf8aadb",
-    "Localization/ja.lproj/Localizable.strings": "2342af1132cc387cda92e70963ea1d503685e04c4a847608b3b017c9672165e9",
+    "Localization/en.lproj/Localizable.strings": "04f64caa780ff90882b199640cb6829805ed1b257213f8a35fbeb59da0d81030",
+    "Localization/ja.lproj/Localizable.strings": "e6f6c46f02869d924b0a7932d157a2d7f86f4a820fc95766c824bfa19362693b",
     "PUBLICATION_AUDIT.md": "99c766db7c086979dc0786b4b314ed62f0063aae4005f444e7e115344769303e",
     "PUBLICATION_CHECKLIST.md": "c5915e111986696456307ad6dc479193d5c4aebbc0a4d88a75e8fc3e1a5e324e",
     "Package.swift": "b60fb2a19437f7a67e238ae1b88d955d733ee2fee134962af98c63cd0e36986f",
@@ -33,7 +33,7 @@
     "Sources/AIChecker/MenuBarPresentation.swift": "ba244cac1e7f6ba5c8be081daa699cb96287324f459f7e7c82ed113375560178",
     "Sources/AIChecker/MenuVisualStyle.swift": "1a7b8c827e83a0b7079ae975d48db86a4aef90a9d7018c4a16bea60526d265e1",
     "Sources/AIChecker/OnDemandNetworkSpeed.swift": "75f6a902c53b4e562ba713ad3ab4d4a8b3c893e802179685bb31a8fde8daefed",
-    "Sources/AIChecker/PersistentAccountsPanel.swift": "8b9ef7d324cd572de421277502a5ae82baf57882167481e40f1d5d4916dd5de2",
+    "Sources/AIChecker/PersistentAccountsPanel.swift": "2afd25e1015086fac651620f7ae6dc49568dffe022edeb1b7a497f21291b91f3",
     "Sources/AIChecker/PersistentSettingsPanel.swift": "8aab44b69cbb16f3341bf43c7aa86c1b6702c494e0e796bda5ab9e33f5f8b792",
     "Sources/AIChecker/ProviderIconArtwork.swift": "b0b749cdfe320b0db93863f783bcbcdbda92dd5b9e4aeeb503b31ff1e100986a",
     "Sources/AIChecker/QuotaColorPalette.swift": "b5a2551e483bb61fa7f3bbf64977a099c796083f42d51f4ec6edf05983e3899d",
@@ -43,7 +43,7 @@
     "Sources/AIChecker/UsageDashboardMenuView.swift": "fa0732425176ee4d4d3cd7ae42295aa8a213cce04f40dab39b6539b7355860d3",
     "Sources/AIChecker/UsageQuickPanel.swift": "d22b47f065f7e9cd6feb00726e748d471c07eee94c4ab3e564baefc46bcfc043",
     "Sources/AIChecker/UsageSpeedHeaderView.swift": "a66c8f5872eded0aea10daf9fc4c51870649982344e770a5d484a10a9662e0c1",
-    "Sources/AIChecker/main.swift": "42e46233674bfa722422b4e287c986a976acd322305e913007b9a79ee79d19af",
+    "Sources/AIChecker/main.swift": "ee5b9a22cdaf19e14ac699f88792ac19f91a5e5fddcddb5cb00bee29dd82cd22",
     "Sources/AICheckerCore/AIProviderRegistry.swift": "3f0efc1cd4934e1818fc26e86175eadda33d814e917351a630b6b0be98ee60d1",
     "Sources/AICheckerCore/AccountProfiles.swift": "4df0fd98d377e6ffe580fb87781da606b73023c51882d98c8c2713ce6b405562",
     "Sources/AICheckerCore/ClaudeWebUsage.swift": "e669e17e32a1b7e59520005c4f8f0871bc321199518f3c95bfbd7691368a903c",
@@ -97,7 +97,7 @@
     "Tests/test_public_release.py": "71709dad4c417174a37bd2d8ec9b06172c931c2a1ecb0fe1888ad4d13fc0a3ea",
     "Tests/test_quota_notifications_integration.py": "02d9188e70ce5d0f5c45ee10dce49e8c9261a20b771463e59006b6dfe887e938",
     "Tests/test_release_checksum.py": "35a0722f6879f80bc1649975558071adefd9d8ebbccdeea7eecf920cde60314b",
-    "Tests/test_release_invariants.py": "281f63d8e60f9851c6753baff51652d64b0bfcc8f03852f633b123369c63d610",
+    "Tests/test_release_invariants.py": "6a4f18ebae1b70b94ed338041d79b5962a38ed0b06735050f43722e806f6b056",
     "Tests/test_spotlight_reopen.py": "dfd042f295b69eabfef00f8af06bbdc7920af069d819b3e9e25b57dce3fb9dff",
     "docs/CLAUDE_TELEMETRY_AND_PROVENANCE.md": "c5f37985c2bf16114c70c9657178880a45bf1a7aa42cd2e17bf43add14c95b9a",
     "docs/DISTRIBUTION.md": "3d73e446525568e514ae61250c621a2aaa83c51a9003fc22ec5ae841b69eb30d",
@@ -132,6 +132,8 @@
     "scripts/verify-source-manifest.py": "ed9af2748bc46f8617f477b1b34b1b07c3075ea061376ab0a11711539000fa24",
     "scripts/preflight-isolated-e2e.py": "fcbe357844e13921e8877a852d35497769e08e65cd7395f6faa017e25c4f7023",
     "Tests/test_isolated_e2e_preflight.py": "9775923aeec26009dba59bde2fe0aee0875ffa06876ea99ac96a0a49bdec7af1",
-    "docs/ISOLATED_E2E_PROTOCOL.md": "024ea16da143c17f344a8f16e52e0e545b04717506812aff0226807808d6edd5"
+    "docs/ISOLATED_E2E_PROTOCOL.md": "024ea16da143c17f344a8f16e52e0e545b04717506812aff0226807808d6edd5",
+    "Tests/test_public_account_menu_parity.py": "30f8a3b0d83f814167f022a5b838b32ee007e1027b24ba62309079f60e378506",
+    "docs/V1_11_SOURCE_RELEASE_GATE.md": "082b02d594c4870bdec052b7c32c2ebf4fb6ed7a90c88e4f47c5b9c9614ed4a0"
   }
 }

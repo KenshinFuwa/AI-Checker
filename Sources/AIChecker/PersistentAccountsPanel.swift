@@ -4,6 +4,7 @@ import AICheckerCore
 /// Actions are dispatched by the application. This view never accesses or stores credentials.
 enum AccountPanelAction {
     case selectCodex(UUID), selectClaude(UUID)
+    case advancedCodex, advancedClaude, disconnectClaudeCode
     case addCodex, loginCodex, logoutCodex, renameCodex, removeCodex, reconnectCodex, refreshQuotas, chooseCodexCLI
     case addClaude, loginClaudeWeb, refreshClaudeWeb, disconnectClaudeWeb, loginClaudeCode, renameClaude, removeClaude
     case configureCopilot, disconnectCopilot, refreshCopilot, copilotInfo, copilotTroubleshooting, toggleCopilotBar
@@ -144,24 +145,23 @@ final class PersistentAccountsPanel: NSObject, NSWindowDelegate {
                 rows.append(.command("\(record.selected ? "✓ " : "○ ")\(record.label)", .selectCodex(record.id), true))
             }
             rows += [.command("アカウントを追加…", .addCodex, true),
-                     .command("選択中アカウントでログイン…", .loginCodex, !state.codex.isEmpty),
-                     .command("選択中アカウントからログアウト", .logoutCodex, !state.codex.isEmpty),
+                     .command("接続を設定…", .loginCodex, !state.codex.isEmpty),
+                     .command("接続を解除…", .logoutCodex, !state.codex.isEmpty),
                      .command("名前を変更…", .renameCodex, !state.codex.isEmpty),
                      .command("選択中アカウントを削除…", .removeCodex, !state.codex.isEmpty),
-                     .command("残量を更新", .refreshQuotas, true),
-                     .command("接続を修復", .reconnectCodex, true),
-                     .command("Codex CLIの場所を選択…", .chooseCodexCLI, true)]
+                     .command("詳細設定…", .advancedCodex, true)]
         case .claude:
-            rows += [.caption("CLAUDE  /  プロフィール管理"), .label("状態: \(state.claudeStatus)")]
-            if state.claude.isEmpty { rows.append(.label("未登録 — 以下からプロフィールを追加できます")) }
+            rows += [.caption("CLAUDE  /  アカウント管理"), .label("状態: \(state.claudeStatus)")]
+            if state.claude.isEmpty { rows.append(.label("未登録 — 以下からアカウントを追加できます")) }
             for record in state.claude {
                 rows.append(.command("\(record.selected ? "✓ " : "○ ")\(record.label)", .selectClaude(record.id), true))
             }
-            rows += [.command("プロフィールを追加…", .addClaude, true),
-                     .command("残量を更新", .refreshQuotas, true),
+            rows += [.command("アカウントを追加…", .addClaude, true),
                      .command("接続を設定…", .loginClaudeCode, !state.claude.isEmpty),
+                     .command("接続を解除…", .disconnectClaudeCode, !state.claude.isEmpty),
                      .command("名前を変更…", .renameClaude, !state.claude.isEmpty),
-                     .command("選択中プロフィールを削除…", .removeClaude, !state.claude.isEmpty)]
+                     .command("選択中アカウントを削除…", .removeClaude, !state.claude.isEmpty),
+                     .command("詳細設定…", .advancedClaude, true)]
         case .copilot:
             rows += [.caption("GITHUB COPILOT  /  個人請求レポート"),
                      .label(state.copilotConfigured ? "接続設定あり" : "未接続（メインメニューから非表示）"),
@@ -172,8 +172,7 @@ final class PersistentAccountsPanel: NSObject, NSWindowDelegate {
                      .command("個人課金APIを接続・更新…", .configureCopilot, state.copilotMode.permitsPersonalBillingAPI),
                      .command("Copilot取得対象について…", .copilotInfo, true)]
             if state.copilotConfigured {
-                rows += [.command("今すぐ使用量を取得", .refreshCopilot, state.copilotMode.permitsPersonalBillingAPI),
-                         .command("\(state.copilotBarEnabled ? "✓ " : "")メニューバーへの表示を切り替える", .toggleCopilotBar, state.copilotMode.permitsPersonalBillingAPI),
+                rows += [.command("\(state.copilotBarEnabled ? "✓ " : "")メニューバーへの表示を切り替える", .toggleCopilotBar, state.copilotMode.permitsPersonalBillingAPI),
                          .command("通信エラーの対処…", .copilotTroubleshooting, true),
                          .command("保存済みトークンを削除して切断…", .disconnectCopilot, true)]
             }
@@ -187,8 +186,7 @@ final class PersistentAccountsPanel: NSObject, NSWindowDelegate {
                          .label("状態: \(state.externalStatuses[kind] ?? "未取得")"),
                          .command("\(kind.name) のAPIキーを登録・更新…", .configureAPI(kind), true)]
                 if configured {
-                    rows += [.command("今すぐ取得", .refreshAPI(kind), true),
-                             .command("Keychainのキーを削除して切断…", .disconnectAPI(kind), true)]
+                    rows += [.command("Keychainのキーを削除して切断…", .disconnectAPI(kind), true)]
                 }
             }
         case .catalog:

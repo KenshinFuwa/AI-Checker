@@ -272,3 +272,13 @@
 "Awaiting update" = "更新待ち";
 "測定中…" = "測定中…";
 "  AI CHECKER  /  USAGE" = "  AI CHECKER  /  利用状況";
+"接続を解除…" = "接続を解除…";
+"詳細設定…" = "詳細設定…";
+"Codexの詳細設定" = "Codexの詳細設定";
+"Claudeの詳細設定" = "Claudeの詳細設定";
+"公式Codex CLIの実行ファイルを選択できます。残量の更新は共通の更新メニューから行ってください。" = "公式Codex CLIの実行ファイルを選択できます。残量の更新は共通の更新メニューから行ってください。";
+"Claude Codeの専用セッションでstatusLine連携を設定できます。Claude Webの非公開残量APIは使用しません。" = "Claude Codeの専用セッションでstatusLine連携を設定できます。Claude Webの非公開残量APIは使用しません。";
+"Claude Codeの接続解除" = "Claude Codeの接続解除";
+"AI CheckerはClaude Codeを自動ログアウトできません。専用セッションを開き、Claude Codeで /logout を実行してください。操作後に接続状態を確認してください。" = "AI CheckerはClaude Codeを自動ログアウトできません。専用セッションを開き、Claude Codeで /logout を実行してください。操作後に接続状態を確認してください。";
+"専用セッションを開く" = "専用セッションを開く";
+"Claude Codeで接続…" = "Claude Codeで接続…";

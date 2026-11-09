@@ -13,7 +13,7 @@ for tool in python3 codesign hdiutil lipo shasum mktemp; do
 done
 python3 scripts/verify-source-manifest.py
 OUTPUT_DIR="$ROOT/dist"
-NAME='AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW.dmg'
+NAME='AI-Checker-v1.11.0-UNNOTARIZED-PREVIEW.dmg'
 DMG="$OUTPUT_DIR/$NAME"
 CHECKSUM="$DMG.sha256"
 NOTICE="$OUTPUT_DIR/README-UNNOTARIZED-PREVIEW.txt"
@@ -47,7 +47,7 @@ fi
 lipo "$APP/Contents/MacOS/AIChecker" -verify_arch arm64 x86_64
 ln -s /Applications "$TEMP/dmgroot/Applications"
 cat > "$TEMP/dmgroot/READ-ME-UNNOTARIZED.txt" <<'NOTICE'
-AI Checker v1.10.1 — UNNOTARIZED TEST PREVIEW / 未公証テスト版
+AI Checker v1.11.0 — UNNOTARIZED TEST PREVIEW / 未公証テスト版
 
 This is NOT signed with Apple Developer ID and has NOT been notarized by Apple.
 macOS Gatekeeper may refuse to open it. This preview must not be presented

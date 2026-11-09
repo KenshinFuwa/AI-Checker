@@ -1,3 +1,5 @@
+> **v1.11.0 release candidate (NOT PUBLISHED):** [PR #19](https://github.com/KenshinFuwa/AI-Checker/pull/19) prepares the next public-source release. The current published beta is still v1.10.1-beta.2; this candidate does not include a notarized installer. Private Claude Web features are not part of the public source.
+
 > **Published source beta (2026-10-27):** [AI Checker v1.10.1-beta.1](https://github.com/KenshinFuwa/AI-Checker/releases/tag/v1.10.1-beta.1) is available as a **source-only GitHub pre-release**. Tag and `main` were verified at commit `9c371da7b4a362ec517e4b9a9b514eda915def48`; its GitHub Actions checks passed 4/4. No Developer ID-signed/notarized end-user installer is included. The original RC2.3 owner-Mac offline QA passed 8/8; that separately tested ZIP is not byte-identical to GitHub-generated source archives. See [release gate](RELEASE_GATE.md).
 
 # AI Checker
@@ -91,7 +93,7 @@ The source code and the [source-only beta pre-release](https://github.com/Kenshi
 
 ## End-user distribution
 
-See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) for guarded Developer ID signing and notarization. **No signed DMG is currently available.** The author’s successful Spotlight test required restarting the Mac’s Spotlight indexing services; the app did not fix Spotlight by itself. After an official release exists, verify its `.sha256` alongside the downloaded DMG using `python3 scripts/verify-release-checksum.py /absolute/path/AI-Checker-v1.10.1-notarized.dmg /absolute/path/AI-Checker-v1.10.1-notarized.dmg.sha256`. A checksum only checks file integrity against the supplied digest; it does **not** establish who published either file, Apple notarization, or Gatekeeper approval.
+See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) for guarded Developer ID signing and notarization. **No signed DMG is currently available.** The author’s successful Spotlight test required restarting the Mac’s Spotlight indexing services; the app did not fix Spotlight by itself. After an official release exists, verify its `.sha256` alongside the downloaded DMG using `python3 scripts/verify-release-checksum.py /absolute/path/AI-Checker-v1.11.0-notarized.dmg /absolute/path/AI-Checker-v1.11.0-notarized.dmg.sha256`. A checksum only checks file integrity against the supplied digest; it does **not** establish who published either file, Apple notarization, or Gatekeeper approval.
 
 ## Spotlight app discovery
 

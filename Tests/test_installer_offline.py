@@ -77,7 +77,7 @@ class OfflineInstallFlowTests(unittest.TestCase):
             backup = home / 'Applications' / 'AI Checker.previous.app'
             self.assertEqual((backup / 'Contents' / 'MacOS' / 'AIChecker').read_text(), 'OLD-BINARY')
             self.assertIn('AI Checker.app', (home / 'opened.txt').read_text())
-            self.assertIn('1.10.1', (dest / 'Contents' / 'Info.plist').read_text())
+            self.assertIn('1.11.0', (dest / 'Contents' / 'Info.plist').read_text())
 
     def test_build_failure_never_stops_or_overwrites_existing_app(self):
         with tempfile.TemporaryDirectory() as tmp:

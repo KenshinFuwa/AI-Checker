@@ -56,7 +56,7 @@ info=plistlib.loads(p.read_bytes())
 expected={
     'CFBundleIdentifier':'dev.aichecker.localapp',
     'CFBundleExecutable':'AIChecker',
-    'CFBundleShortVersionString':'1.10.1',
+    'CFBundleShortVersionString':'1.11.0',
     'CFBundleIconFile':'AppIcon.icns',
     'CFBundlePackageType':'APPL',
     'CFBundleDevelopmentRegion':'en',

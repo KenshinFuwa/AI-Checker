@@ -24,15 +24,15 @@ jobs:
         run: bash scripts/build-free-preview-dmg.sh --acknowledge-unnotarized-preview
       - name: Recheck preview checksum and artifact type
         run: |
-          python3 scripts/verify-release-checksum.py "$PWD/dist/AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW.dmg" "$PWD/dist/AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW.dmg.sha256"
+          python3 scripts/verify-release-checksum.py "$PWD/dist/AI-Checker-v1.11.0-UNNOTARIZED-PREVIEW.dmg" "$PWD/dist/AI-Checker-v1.11.0-UNNOTARIZED-PREVIEW.dmg.sha256"
           test -s dist/README-UNNOTARIZED-PREVIEW.txt
       - name: Upload temporary test artifact (NOT GitHub Release)
         uses: actions/upload-artifact@v4
         with:
-          name: AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW-NOT-APPLE-VERIFIED
+          name: AI-Checker-v1.11.0-UNNOTARIZED-PREVIEW-NOT-APPLE-VERIFIED
           path: |
-            dist/AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW.dmg
-            dist/AI-Checker-v1.10.1-UNNOTARIZED-PREVIEW.dmg.sha256
+            dist/AI-Checker-v1.11.0-UNNOTARIZED-PREVIEW.dmg
+            dist/AI-Checker-v1.11.0-UNNOTARIZED-PREVIEW.dmg.sha256
             dist/README-UNNOTARIZED-PREVIEW.txt
           if-no-files-found: error
           retention-days: 7

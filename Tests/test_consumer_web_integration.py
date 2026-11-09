@@ -53,7 +53,7 @@ class ConsumerWebTests(unittest.TestCase):
         self.assertIn('DispatchQueue.main.async',main)
 
     def test_version_and_docs_explicit(self):
-        self.assertIn('<string>1.10.1</string>',(ROOT/'scripts/install-local.sh').read_text())
+        self.assertIn('<string>1.11.0</string>',(ROOT/'scripts/install-local.sh').read_text())
         guide = (ROOT / 'README.md').read_text()
         security = (ROOT / 'SECURITY.md').read_text()
         self.assertIn('manual notes', guide)

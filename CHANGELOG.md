@@ -1,3 +1,11 @@
+## v1.11.0 — public-source release candidate (NOT YET PUBLISHED)
+
+- Unify Codex and Claude account menu labels, order and advanced settings entry.
+- Keep a single global usage refresh action. Codex App Server reconnect/retry stays active.
+- Claude Code uses official statusLine; public source does not implement private Claude Web quota polling. Claude Code logout remains user-controlled.
+- Align CFBundleShortVersionString, CFBundleVersion, guarded distribution filenames and tests for 1.11.0.
+- CI and isolated source QA do not establish real-provider authentication, normal first-run GUI, Apple notarization or clean-install behavior. Stable release remains gated by owner review and isolated E2E.
+
 ## Unreleased — packaged native en/ja locale CI smoke
 
 - On the disposable unsigned CI DMG, exercise native AppKit menu localization under process-only English and Japanese language overrides, in addition to the existing no-account packaged bootstrap.

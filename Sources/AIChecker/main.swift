@@ -802,15 +802,13 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             }
             menu.addItem(.separator())
             command("アカウントを追加…", .addCodex)
-            command("ログイン…", .loginCodex, enabledWhen: { [weak self] in self?.accountConfig.activeCodex != nil })
-            command("ログアウト…", .logoutCodex, enabledWhen: { [weak self] in self?.accountConfig.activeCodex != nil })
+            command("接続を設定…", .loginCodex, enabledWhen: { [weak self] in self?.accountConfig.activeCodex != nil })
+            command("接続を解除…", .logoutCodex, enabledWhen: { [weak self] in self?.accountConfig.activeCodex != nil })
             command("名前を変更…", .renameCodex, enabledWhen: { [weak self] in self?.accountConfig.activeCodex != nil })
             command("選択中アカウントを削除…", .removeCodex, enabledWhen: { [weak self] in self?.accountConfig.activeCodex != nil })
-            command("残量を更新", .refreshQuotas)
-            command("接続を修復", .reconnectCodex)
-            command("Codex CLIの場所を選択…", .chooseCodexCLI)
+            command("詳細設定…", .advancedCodex)
         case .claude:
-            menu.addItem(MenuVisualStyle.heading("CLAUDE / プロフィール"))
+            menu.addItem(MenuVisualStyle.heading("CLAUDE / アカウント"))
             if state.claude.isEmpty { menu.addItem(withTitle: "未登録", action: nil, keyEquivalent: "") }
             for record in state.claude {
                 command(record.label, .selectClaude(record.id), true, selected: { [weak self] in
@@ -818,14 +816,18 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
                 })
             }
             menu.addItem(.separator())
-            command("プロフィールを追加…", .addClaude)
-            command("残量を更新", .refreshQuotas)
+            command("アカウントを追加…", .addClaude)
             command("接続を設定…", .loginClaudeCode,
+                    enabledWhen: { [weak self] in self?.accountConfig.activeClaude != nil })
+            // Official Claude Code has no supported third-party sign-out API.
+            // Guide the user to manual /logout; never claim automatic sign-out.
+            command("接続を解除…", .disconnectClaudeCode,
                     enabledWhen: { [weak self] in self?.accountConfig.activeClaude != nil })
             command("名前を変更…", .renameClaude,
                     enabledWhen: { [weak self] in self?.accountConfig.activeClaude != nil })
-            command("選択中プロフィールを削除…", .removeClaude,
+            command("選択中アカウントを削除…", .removeClaude,
                     enabledWhen: { [weak self] in self?.accountConfig.activeClaude != nil })
+            command("詳細設定…", .advancedClaude)
         case .copilot:
             menu.addItem(MenuVisualStyle.heading("COPILOT / 請求API"))
             let modeItem = NSMenuItem(title: "利用区分", action: nil, keyEquivalent: "")
@@ -844,11 +846,6 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             menu.addItem(modeItem)
             command("接続・設定…", .configureCopilot,
                     enabledWhen: { [weak self] in self?.copilotAccessMode.permitsPersonalBillingAPI ?? false })
-            command("今すぐ使用量を取得", .refreshCopilot,
-                    enabledWhen: { [weak self] in
-                        guard let self else { return false }
-                        return self.copilotAccessMode.permitsPersonalBillingAPI && self.copilotClient.configured
-                    })
             command("メニューバーに表示", .toggleCopilotBar,
                     enabledWhen: { [weak self] in
                         guard let self else { return false }
@@ -870,10 +867,6 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
                     DispatchQueue.main.async { [weak self] in
                         self?.performAccountPanelAction(.configureAPI(kind))
                     }
-                }
-                addStayOpenRow("今すぐ取得", to: sub,
-                    enabledWhen: { [weak self] in self?.externalClients[kind]?.configured ?? false }) { [weak self] in
-                    self?.performAccountPanelAction(.refreshAPI(kind))
                 }
                 addStayOpenRow("キーを削除して切断…", to: sub,
                     enabledWhen: { [weak self] in self?.externalClients[kind]?.configured ?? false }) { [weak self] in
@@ -912,10 +905,6 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
             DispatchQueue.main.async { [weak self] in
                 self?.performAccountPanelAction(.configureAPI(kind))
             }
-        }
-        addStayOpenRow("今すぐ取得", to: menu,
-                       enabledWhen: { [weak self] in self?.externalClients[kind]?.configured ?? false }) { [weak self] in
-            self?.performAccountPanelAction(.refreshAPI(kind))
         }
         addStayOpenRow("キーを削除して切断…", to: menu,
                        enabledWhen: { [weak self] in self?.externalClients[kind]?.configured ?? false }) { [weak self] in
@@ -1086,6 +1075,31 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         return item
     }
 
+    /// Identical account menus, with provider-specific advanced actions.
+    private func showAccountAdvancedDetails(codex: Bool) {
+        let alert = NSAlert()
+        alert.messageText = AppL10n.text(codex ? "Codexの詳細設定" : "Claudeの詳細設定")
+        alert.informativeText = AppL10n.text(codex
+            ? "公式Codex CLIの実行ファイルを選択できます。残量の更新は共通の更新メニューから行ってください。"
+            : "Claude Codeの専用セッションでstatusLine連携を設定できます。Claude Webの非公開残量APIは使用しません。")
+        alert.addButton(withTitle: AppL10n.text(codex ? "Codex CLIの場所を選択…" : "Claude Codeで接続…"))
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        if codex { chooseCodexExecutable() }
+        else { openClaudeCode() }
+    }
+
+    /// Claude Code credential removal is never silently claimed or performed.
+    private func requestClaudeCodeLogout() {
+        guard accountConfig.activeClaude != nil else { return }
+        let alert = NSAlert()
+        alert.messageText = AppL10n.text("Claude Codeの接続解除")
+        alert.informativeText = AppL10n.text("AI CheckerはClaude Codeを自動ログアウトできません。専用セッションを開き、Claude Codeで /logout を実行してください。操作後に接続状態を確認してください。")
+        alert.addButton(withTitle: AppL10n.text("専用セッションを開く"))
+        alert.addButton(withTitle: AppL10n.text("キャンセル"))
+        if alert.runModal() == .alertFirstButtonReturn { openClaudeCode() }
+    }
+
     private func performAccountPanelAction(_ action: AccountPanelAction) {
         switch action {
         case .selectCodex(let id): selectCodexAccount(accountItem(id.uuidString))
@@ -1096,6 +1110,9 @@ final class AICheckerApplication: NSObject, NSApplicationDelegate, NSMenuDelegat
         case .renameCodex: renameCodex()
         case .removeCodex: removeCodex()
         case .reconnectCodex: reconnectCodex()
+        case .advancedCodex: showAccountAdvancedDetails(codex: true)
+        case .advancedClaude: showAccountAdvancedDetails(codex: false)
+        case .disconnectClaudeCode: requestClaudeCodeLogout()
         case .refreshQuotas: refresh(force: true)
         case .chooseCodexCLI: chooseCodexExecutable()
         case .addClaude: addClaudeAccount()

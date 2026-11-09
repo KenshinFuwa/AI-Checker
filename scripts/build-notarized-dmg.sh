@@ -43,7 +43,7 @@ DMGROOT="$TEMP/dmgroot"
 mkdir -p "$DMGROOT"
 cp -R "$APP" "$DMGROOT/AI Checker.app"
 ln -s /Applications "$DMGROOT/Applications"
-DMG="$TEMP/AI-Checker-v1.10.1-notarized.dmg"
+DMG="$TEMP/AI-Checker-v1.11.0-notarized.dmg"
 hdiutil create -quiet -volname 'AI Checker' -srcfolder "$DMGROOT" -format UDZO -ov "$DMG"
 hdiutil verify "$DMG" >/dev/null
 # Submit without printing secrets. The Keychain profile must have been configured by the owner.
@@ -64,7 +64,7 @@ hdiutil verify "$DMG" >/dev/null
 # Independently mount and inspect the signed, notarized, stapled DMG.
 bash scripts/audit-release-dmg.sh --signed-release "$DMG"
 mkdir -p "$ROOT/dist"
-OUTPUT="$ROOT/dist/AI-Checker-v1.10.1-notarized.dmg"
+OUTPUT="$ROOT/dist/AI-Checker-v1.11.0-notarized.dmg"
 [[ ! -e "$OUTPUT" ]] || { echo 'ERROR: distribution artifact already exists; refuse overwrite.' >&2; exit 3; }
 cp "$DMG" "$OUTPUT"
 (cd "$ROOT/dist" && shasum -a 256 "$(basename "$OUTPUT")" > "$(basename "$OUTPUT").sha256")

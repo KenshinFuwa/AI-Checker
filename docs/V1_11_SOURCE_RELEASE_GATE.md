@@ -21,3 +21,9 @@ Release blockers before a stable tag:
 
 The installed private Claude WebKit build is not feature-identical to this
 public-source candidate. Developer ID signing/notarization are a separate gate.
+
+Bundle metadata and guarded test/distribution artifact names are aligned to
+`1.11.0` in the **candidate only**. No public binary release is implied.
+
+See [the draft release notes](../RELEASE_NOTES_v1.11.0_RC.md) for exact scope and
+unmet validation requirements.

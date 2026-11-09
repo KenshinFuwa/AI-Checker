@@ -11,8 +11,8 @@
 <key>CFBundleDisplayName</key><string>AI Checker</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleSignature</key><string>????</string>
-<key>CFBundleShortVersionString</key><string>1.10.1</string>
-<key>CFBundleVersion</key><string>11001</string>
+<key>CFBundleShortVersionString</key><string>1.11.0</string>
+<key>CFBundleVersion</key><string>11100</string>
 <key>LSMinimumSystemVersion</key><string>13.0</string>
 <key>LSUIElement</key><true/>
 <key>NSHighResolutionCapable</key><true/>
